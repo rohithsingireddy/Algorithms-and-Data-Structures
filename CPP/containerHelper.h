@@ -1,54 +1,5 @@
-#include <iostream>
-namespace containerPrint{
-	// Courtesy of stack exchange....
-	template <template <typename... Args> class ContainerT, typename... Args>
-	std::ostream& operator << (std::ostream& stream, const ContainerT <Args...> & container)
-		{
-		stream << "{ ";
-		for (auto&& elem : container) stream << elem << " ";
-		stream << "}\n";
-		return stream;
-		}
 
-	template <template <typename T, size_t N, typename... Args> class ContainerT, typename T, size_t N, typename... Args>
-	std::ostream& operator << (std::ostream& stream, const ContainerT <T, N, Args...> & container)
-		{
-		stream << "{ ";
-		for (auto&& elem : container) stream << elem << " ";
-		stream << "}\n";
-		return stream;
-		}
 
-	template<typename T1, typename T2>
-	std::ostream& operator << (std::ostream& stream, const std::pair <T1, T2> & val)
-		{ 
-		stream << "{" << val.first << " " << val.second << "}\n";
-		return stream;
-		}
-
-	std::ostream& operator << (std::ostream& stream, const std::string& str)
-		{
-		stream << str.c_str();
-		return stream;
-		}
-
-	std::wostream& operator << (std::wostream& stream, const std::wstring& str)
-		{
-		stream << str.c_str();
-		return stream;
-		}
-	
-};
-using namespace containerPrint;
-
-/* LCM
-ll lcm(ll a, ll b)
-{
-	ll p = a*b;
-	return (p/__gcd(a,b));
-}
-* 
-*/
 
 /*Matrix adjacent
 //			 D  R   U   L

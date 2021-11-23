@@ -1,13 +1,17 @@
-#include<bits/stdc++.h>
-using namespace std;
+#include <iostream>
+#include <stack>
 
 
+// Usage: binTree<'type'> var
+// Default type is int
+
+template<typename T = int>
 struct binNode{
 	binNode* parent;
 	binNode* left;
 	binNode* right;
-	int val;
-	binNode(binNode* p=nullptr, binNode* l=nullptr, binNode* r=nullptr, int v=0){
+	T val;
+	binNode(binNode* p=nullptr, binNode* l=nullptr, binNode* r=nullptr, T v=0){
 		parent = p;
 		left = l;
 		right = r;
@@ -15,10 +19,13 @@ struct binNode{
 	}
 };
 
-struct binTree{
-	binNode* root=nullptr;
 
-	void insert(int val){
+template<typename T = int>
+struct BinTree{
+	binNode<T>* root=nullptr;
+
+	// Inserting into the tree
+	void insert(T val){
 		auto temp = root, trail_temp = root;
 		while(temp){
 			trail_temp = temp;
@@ -27,7 +34,7 @@ struct binTree{
 			else
 				temp = temp->right;
 		}
-		binNode* node = new binNode(trail_temp, nullptr, nullptr, val);
+		binNode<T>* node = new binNode<T>(trail_temp, nullptr, nullptr, val);
 		if(trail_temp==nullptr)
 			root = node;
 		else if(val <= trail_temp->val)
@@ -36,8 +43,8 @@ struct binTree{
 			trail_temp->right = node;
 	}
 
-
-	void transplant(binNode* replaced, binNode* replacement){
+	// Replacing a sub tree with another sub tree
+	void transplant(binNode<T>* replaced, binNode<T>* replacement){
 		auto parent = replaced->parent;
 		if(parent==nullptr){
 			root = replacement; 
@@ -50,14 +57,16 @@ struct binTree{
 			replacement->parent = parent;
 	}
 
-	void delNode(int val){
-		binNode* nodePtr = search(val);
+
+	// Removing a node from the tree
+	void delNode(T val){
+		binNode<T>* nodePtr = search(val);
 		if(nodePtr==nullptr)
 			return;
 		if(nodePtr->left==nullptr)
 			transplant(nodePtr, nodePtr->right);
 		else if(nodePtr->right==nullptr)
-			transplant(nodePtr, nodePtr->right);
+			transplant(nodePtr, nodePtr->left);
 		else{
 			auto suc = successor(nodePtr);
 			if(suc->parent!=nodePtr){
@@ -71,7 +80,8 @@ struct binTree{
 		}
 	}
 
-	binNode* successor(binNode* temp){
+	// Finding the upper bound of a given node
+	binNode<T>* successor(binNode<T>* temp){
 		if(temp->right!=nullptr)
 			return minOfTree(temp->right);
 		auto parent = temp->parent;
@@ -83,13 +93,16 @@ struct binTree{
 		
 	}
 
-	binNode* minOfTree(binNode* temp){
+	// Finding the node with minimum value in a given tree or sub tree
+	binNode<T>* minOfTree(binNode<T>* temp){
 		while(temp->left)
 			temp = temp->left;
 		return temp;
 	}
 
-	binNode* search(int val){
+
+	// Searching for a node with a given value in the tree
+	binNode<T>* search(T val){
 		auto temp = root;
 		while(temp){
 			if(temp->val==val)
@@ -101,8 +114,9 @@ struct binTree{
 		return temp;
 	}
 
-	void inorderTraversal(binNode* r){
-		stack<binNode*> st;
+	// Printing contents of tree through iterative inorder traversal
+	void inorderTraversal(binNode<T>* r){
+		std::stack<binNode<T>*> st;
 		auto temp = r;
 		bool done =1;
 		while(done){
@@ -116,7 +130,7 @@ struct binTree{
 				else{
 					temp = st.top();
 					st.pop();
-					cout<<temp->val<<' ';
+					std::cout<<temp->val<<' ';
 					temp = temp->right;
 				}
 			}
@@ -124,19 +138,3 @@ struct binTree{
 	}
 
 };
-
-
-int main(){
-	vector<int> a{15,6,18,3,7,17,20,2,4,13,9};
-	binTree bt;
-	for(auto i:a)
-		bt.insert(i);
-	bt.delNode(6);
-	//bt.delNode(3);
-	bt.inorderTraversal(bt.root);
-	cout<<'\n';
-	//cout<<bt.predecessor(bt.search(6))->val;
-	for(int i=0;i<10;i++)
-		bt.delNode(i);
-	bt.inorderTraversal(bt.root);
-}

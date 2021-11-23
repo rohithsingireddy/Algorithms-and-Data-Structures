@@ -1,4 +1,4 @@
-#include<bits/stdc++.h>
+#include<vector>
 //Linked Set Representation
 /*
 template<typename T=int>
@@ -43,7 +43,7 @@ set_node<T>* find_set(set_node<T> *a){
 }
 */
 const int maxn = 5e5 + 500;
-vector<int> Parent(maxn), Rank(maxn), Size(maxn);
+std::vector<int> Parent(maxn), Rank(maxn), Size(maxn);
 
 // intialize user groups with just 1 element i.e itself
 void init(){
@@ -66,7 +66,8 @@ bool unite(int u, int v){
 	u = find_root(u);
 	v = find_root(v);
 	if(u != v){
-		if(Rank[u] < Rank[v])swap(u, v);
+		if(Rank[u] < Rank[v])
+			std::swap(u, v);
 		Parent[v] = u;
 		if(Rank[u] == Rank[v])Rank[u]++;
 		Size[u] += Size[v];
