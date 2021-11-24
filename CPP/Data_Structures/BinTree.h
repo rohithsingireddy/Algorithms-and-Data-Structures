@@ -1,10 +1,6 @@
 #include <iostream>
 #include <stack>
 
-
-// Usage: binTree<'type'> var
-// Default type is int
-
 template<typename T = int>
 struct binNode{
 	binNode* parent;
@@ -24,7 +20,10 @@ template<typename T = int>
 struct BinTree{
 	binNode<T>* root=nullptr;
 
-	// Inserting into the tree
+	/*
+	 * Takes a value and inserts into the binary tree
+	 * Returns null
+	 */
 	void insert(T val){
 		auto temp = root, trail_temp = root;
 		while(temp){
@@ -43,7 +42,10 @@ struct BinTree{
 			trail_temp->right = node;
 	}
 
-	// Replacing a sub tree with another sub tree
+	/*
+	 * Takes two subtrees and replaces one with other sub tree
+	 * Returns null
+	 */ 
 	void transplant(binNode<T>* replaced, binNode<T>* replacement){
 		auto parent = replaced->parent;
 		if(parent==nullptr){
@@ -58,7 +60,10 @@ struct BinTree{
 	}
 
 
-	// Removing a node from the tree
+	/* 
+	 * Removes the given node from the sub-tree and readjusts the tree
+	 * Returns null
+	 */ 
 	void delNode(T val){
 		binNode<T>* nodePtr = search(val);
 		if(nodePtr==nullptr)
@@ -80,7 +85,10 @@ struct BinTree{
 		}
 	}
 
-	// Finding the upper bound of a given node
+	/*
+	 * Takes a given node and gives the smallest node which is greater than it
+	 * Returns a binNode<T> if it exists else null
+	 */ 
 	binNode<T>* successor(binNode<T>* temp){
 		if(temp->right!=nullptr)
 			return minOfTree(temp->right);
@@ -93,7 +101,10 @@ struct BinTree{
 		
 	}
 
-	// Finding the node with minimum value in a given tree or sub tree
+	/* 
+	 * Finds the leftmost ( also know as lowest in value ) node of the subtree
+	 * Returns a binNode<T>
+	 */ 
 	binNode<T>* minOfTree(binNode<T>* temp){
 		while(temp->left)
 			temp = temp->left;
@@ -101,7 +112,10 @@ struct BinTree{
 	}
 
 
-	// Searching for a node with a given value in the tree
+	/*
+	 * Searches for a node with the given value
+	 * Returns a binNode<T> if node exists else null
+	 */
 	binNode<T>* search(T val){
 		auto temp = root;
 		while(temp){
@@ -114,7 +128,10 @@ struct BinTree{
 		return temp;
 	}
 
-	// Printing contents of tree through iterative inorder traversal
+	/* 
+	 * Traverses the tree in order
+	 * Returns null
+	 */
 	void inorderTraversal(binNode<T>* r){
 		std::stack<binNode<T>*> st;
 		auto temp = r;

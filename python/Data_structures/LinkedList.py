@@ -9,15 +9,18 @@ class LinkedNode:
 
 class LinkedList:
 
-    # Initializing variables
+    
     def __init__(self):
         self.size = 0
         self.tail = None
         self.head = None
     
 
-    # Inserting at last of the list
+    
     def addNodeLast(self, value):
+        '''
+            Inserts the givent value at the end of the linked list.
+        '''
         node = LinkedNode(value)
         
         if self.tail != None:
@@ -31,8 +34,10 @@ class LinkedList:
         self.size += 1
 
 
-    #Deleting a given node
     def deleteNode(self, node):
+        '''
+            Deletes a given node from the list and restructures the list
+        '''
         if node == None:
             return
 
@@ -49,16 +54,25 @@ class LinkedList:
             node.prev.next = node.next
 
     
-    #searching for a node with a given value
+    #Searching for a node with a given value
+    #Returns none if value is not found in the linkedlist
     def searchForNode(self, value):
+        '''
+            Searches for a node with given value
+            Returns node if the value is present
+            Else null
+        '''
         current_node = self.head
         while current_node != None and current_node.value != value:
             current_node = current_node.next
         return current_node
 
 
-    #For use in 'for' loops
     def listRange(self):
+        '''
+            Yields the content of the list in forward manner
+            Useful for use in enumeration loops
+        '''
         temp = self.head
         while temp != None:
             yield temp

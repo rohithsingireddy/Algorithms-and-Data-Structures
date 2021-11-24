@@ -8,6 +8,11 @@ class TreeNode:
     
 
     def next(self, value):
+        '''
+            Returns the next child to consider given the value
+            If value is less than node, left child is returned 
+            Else right child is returned
+        '''    
         if value < self.value:
             return self.left
         else:
@@ -22,8 +27,10 @@ class BinTree:
         self.root = None
     
 
-    #inserting into the tree
     def insert(self, value):
+        '''
+            Takes a comparable object and inserts into the tree
+        '''
         if self.root == None:
             self.root = TreeNode(value)
             return
@@ -41,8 +48,11 @@ class BinTree:
         node.parent = current_node
 
     
-    #Replace a subtree with another sub tree( can be a null sub tree)
+    
     def transplant(self, node_to_replace, replacing_node):
+        '''
+            Takes two sub-trees and replaces a tree with another tree
+        '''
         if node_to_replace.parent == None:
             self.root = replacing_node
         
@@ -56,8 +66,14 @@ class BinTree:
             replacing_node.parent = node_to_replace.parent
     
    
-    #Finding the suceesor of a node in a tree( also know as upperbound)
+    
     def get_successor_of_node(self, node):
+        '''
+            Gets the lowest node which is greater than the given node in comparable value
+        '''
+        if node == None:
+            return None
+
         if node.right != None:
             successor_of_node = node.right
             while successor_of_node.left != None:
@@ -65,6 +81,7 @@ class BinTree:
             return successor_of_node
         
         else:
+            #Finding the lowest value that is greater than node valule in its parent subtree
             current_node = node
             parent_of_current_node = current_node.parent
             while parent_of_current_node != None and current_node == parent_of_current_node.right:
@@ -73,8 +90,11 @@ class BinTree:
             return parent_of_current_node
 
 
-    #Deleting a Node in the tree
+    
     def delete(self, node):
+        '''
+            Deletes a given node from the tree and restructures the tree
+        '''
         if node.left == None:
             self.transplant(node, node.right)
         elif node.right == None:
@@ -95,8 +115,12 @@ class BinTree:
             successor_of_node.left.parent = successorNode
 
 
-    #Searching for a node with given value
+    
     def search_tree(self, value):
+        '''
+            Searching for a node with given value
+            Returns None if value cannot be found
+        '''
         current_node = self.root
         while current_node != None:
             if current_node.value == value:
@@ -108,8 +132,11 @@ class BinTree:
         return None
 
 
-    #printing the content of the tree in 'Inorder'
+    
     def print_node_values(self, node):
+        '''
+            Prints the values of the node through inorder traversal
+        '''
         if node != None:
             self.print_node_values(node.left)
             print(node.value, end=' ')

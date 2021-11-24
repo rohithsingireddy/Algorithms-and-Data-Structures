@@ -3,8 +3,10 @@
 template<typename T>
 class QueueArray{
 	
-	// Tail points to the element after last inserted element
-	// Head points to the element that should be returned
+	/*
+	 * Tail points to the element after last inserted element
+	 * Head points to the element that should be returned
+	 */ 
 	private:
 		int head, tail, max_size, current_size;
 		T* queue;
@@ -21,6 +23,11 @@ class QueueArray{
 			is_full = false;
 		}
 
+
+		/*
+	 	* Takes a value and inserts it into back of the queue
+	 	* Returns null
+	 	*/		
 		void enqueue(T value) {
 
 			if( is_full ) {
@@ -38,6 +45,12 @@ class QueueArray{
 			
 		}
 
+		
+		/*
+		* Returns and removes the element at the front of the list
+		* Returns null
+		*/
+
 		T dequeue() {
 			if( is_empty ) {
 				throw "Queue is empty.\n";
@@ -51,11 +64,21 @@ class QueueArray{
 	
 			return element;
 		}
+		
 
+		/*
+		* Returns true if the queue is full
+		* else false
+		*/
 		bool isFull() const {
 			return is_full;
 		}
 
+			
+		/*
+		* Returns true if the queue is empty
+		* else false
+		*/
 		bool isEmpty() const {
 			return is_empty;
 		}

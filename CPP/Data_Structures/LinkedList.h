@@ -14,7 +14,10 @@ struct LinkedList
 	LinkedNode<T> *head = nullptr, *tail = nullptr;
 	LinkedList() {}
 
-	// Insert a node into the end of the list
+	/*
+	 * Takes a value and inserts it at the end of list
+	 * Returns null
+	 */ 
 	void insert(T v)
 	{
 		if (head == nullptr)
@@ -31,7 +34,11 @@ struct LinkedList
 		}
 	}
 
-	// Search for a node with a given value in the list
+	
+	/*
+	 * Takes a value and searches for the node that has the value
+	 * Returns the node if present else null
+	 */
 	LinkedNode<T> *search(T val)
 	{
 		auto temp = head;
@@ -44,6 +51,12 @@ struct LinkedList
 		return nullptr;
 	}
 
+
+	
+	/*
+	 * Takes a node that is to be removed from the list
+	 * Returns null
+	 */
 	void remove(LinkedNode<T> *temp)
 	{
 		if (temp == head)
@@ -66,6 +79,11 @@ struct LinkedList
 		}
 	}
 
+	
+	/*
+	 * Prints the  content of the list in forward
+	 * Returns null
+	 */
 	void print()
 	{
 		auto temp = head;
@@ -77,7 +95,11 @@ struct LinkedList
 		std::cout << '\n';
 	}
 
-	//Merging a list to the end of another list
+	
+	/*
+	 * Merges two disjoint list
+	 * Returns the pointer to the list that called this method after merging
+	 */
 	LinkedList<T> *merge(LinkedList<T> *b)
 	{
 		if (b->head == nullptr)
