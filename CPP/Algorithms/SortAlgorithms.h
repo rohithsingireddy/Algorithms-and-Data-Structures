@@ -171,4 +171,73 @@ namespace Sort {
 		}
 	}
 
+	/*
+	 * Used as a sub procdure in merge sort
+	 */
+	template<typename T>
+	void merge(T* array, int left, int right) {
+		
+		int mid = (left+right)/2;
+		int left_array_size = mid - left + 1;
+		int right_array_size = right - mid;
+
+		T* left_array = new T[left_array_size];
+		T* right_array = new T[right_array_size];
+
+		for( int i = left, j = 0; i <= mid; i++,j++ ) {
+			left_array[j] = array[i];
+		}
+
+		for( int i = mid + 1, j = 0; i <= right; j++,i++ ) {
+			right_array[j] = array[i];
+		}
+
+		int left_index = 0, right_index = 0, current_index = left;
+		
+		while( left_index < left_array_size && right_index < right_array_size ) {
+			if( left_array[left_index] < right_array[right_index] ) {
+				array[current_index++] = left_array[left_index++];
+			}
+			else {
+				array[current_index++] = right_array[right_index++];
+			}
+		}
+
+		while( left_index < left_array_size ) {
+			array[current_index++] = left_array[left_index++];
+		}
+
+		while( right_index < right_array_size ) {
+			array[current_index++] = right_array[right_index++];
+		}
+
+	}
+
+
+	/*
+	 * Takes array, starting index and ending index of the sub array to sort
+	 * Uses merge sort to sort the array
+	 */
+	template<typename T>
+	void merge_sort(T* array, int left, int right) {
+		
+		if( left < right ) {
+			
+			int mid = (left + right)/2;
+			merge_sort(array, left, mid);
+			merge_sort(array, mid+1, right);
+			merge(array, left, right);	
+		}
+	}
+
+
+	/*
+	 * Takes array and its size as input
+	 * Uses Merge sort to sort the array
+	 */
+	template<typename T>
+	void merge_sort(T* array, int size) {
+		merge_sort(array, 0, size-1);
+	}
+
 }

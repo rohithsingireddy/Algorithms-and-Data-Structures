@@ -122,3 +122,46 @@ def radix_sort(array:list, max_digits:int = 10):
     for i in range(size):
         array[i] = number_array[i].actual_value
 
+
+def merge_sort(array:list):
+    '''
+        Takes a list as input and uses merge sort to sort the elements
+    '''
+    size = len(array)
+    
+    widths = [1]
+    while widths[-1] < size:
+        widths.append(widths[-1]*2)
+    widths.append(size-1)
+
+    for width in widths:
+        for left in range(0, size, width*2):
+            
+            right = min(left + 2*width - 1, size - 1)
+            mid = min(left + width, size - 1)
+
+            left_array = [array[i] for i in range(left, mid)]
+            right_array = [array[i] for i in range(mid, right+1)]
+
+            left_index, current_index, right_index = 0, left, 0
+
+            while left_index < len(left_array) and right_index < len(right_array):
+                if left_array[left_index] < right_array[right_index]:
+                    array[current_index] = left_array[left_index]
+                    left_index += 1
+                else:
+                    array[current_index] = right_array[right_index]
+                    right_index += 1
+                current_index += 1
+            
+            while left_index < len(left_array):
+                array[current_index] = left_array[left_index]
+                left_index += 1
+                current_index += 1
+            
+            while right_index < len(right_array):
+                array[current_index] = right_array[right_index]
+                right_index += 1
+                current_index += 1
+        
+

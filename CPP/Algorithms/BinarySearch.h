@@ -1,4 +1,4 @@
-namespace bin_search {
+namespace search {
 	
 	/* 
 	 * Takes a sorted array, its size and element to search as input and returns an integer as output

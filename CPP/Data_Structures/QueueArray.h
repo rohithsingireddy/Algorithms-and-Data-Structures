@@ -1,4 +1,4 @@
-
+#include <iostream>
 
 template<typename T>
 class QueueArray{
@@ -31,7 +31,7 @@ class QueueArray{
 		void enqueue(T value) {
 
 			if( is_full ) {
-				throw "Queue is full.\n";
+				throw std::runtime_error("Invalid due to queue being full\n");
 			}
 
 			queue[tail] = value;
@@ -53,7 +53,7 @@ class QueueArray{
 
 		T dequeue() {
 			if( is_empty ) {
-				throw "Queue is empty.\n";
+				throw std::runtime_error("Invalid operation due to queue being empty\n");
 			}
 			T element = queue[head];
 			head = (head+1) % max_size;

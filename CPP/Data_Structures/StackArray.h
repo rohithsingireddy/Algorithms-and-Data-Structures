@@ -1,4 +1,4 @@
-
+#include <iostream>
 const int STACK_SIZE = 1000;
 
 template<typename T = int>
@@ -14,7 +14,7 @@ struct StackArray{
 	 */
 	void push(T val){
 		if(top >= STACK_SIZE) {
-			throw "Overflow\n";
+			throw std::runtime_error("Overflow\n");
 			return;
 		}
 		stack[++top] = val;
@@ -26,7 +26,7 @@ struct StackArray{
 	 */
 	T pop(){
 		if(top < 0){
-			throw "Underflow\n";
+			throw std::runtime_error("Underflow\n");
 			return T();
 		}
 		return stack[top--];
