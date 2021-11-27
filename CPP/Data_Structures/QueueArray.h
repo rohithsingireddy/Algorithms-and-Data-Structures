@@ -48,7 +48,7 @@ class QueueArray{
 		
 		/*
 		* Returns and removes the element at the front of the list
-		* Returns null
+		* Returns element at the front of the list
 		*/
 
 		T dequeue() {

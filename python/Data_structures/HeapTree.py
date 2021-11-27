@@ -1,5 +1,7 @@
 '''
     Array uses one-based indexing to access elements
+    Implements Max-Heap Tree
+    Can be used for max priority queue
 '''
 class HeapTree:
 

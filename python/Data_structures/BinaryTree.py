@@ -81,7 +81,7 @@ class BinTree:
             return successor_of_node
         
         else:
-            #Finding the lowest value that is greater than node valule in its parent subtree
+            #Finding the lowest value that is greater than node value in its parent subtree
             current_node = node
             parent_of_current_node = current_node.parent
             while parent_of_current_node != None and current_node == parent_of_current_node.right:

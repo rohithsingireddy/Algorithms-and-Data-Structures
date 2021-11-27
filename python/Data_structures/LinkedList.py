@@ -5,6 +5,11 @@ class LinkedNode:
         self.prev = None
         self.value = value
     
+    def __str__(self):
+        string_to_return = str(self.value)
+        if self.next != None:
+            string_to_return += " <--> "
+        return string_to_return
 
 
 class LinkedList:
@@ -77,3 +82,4 @@ class LinkedList:
         while temp != None:
             yield temp
             temp = temp.next
+

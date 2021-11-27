@@ -1,5 +1,10 @@
 #include <iostream>
 
+/*
+ * Array uses one-based indexing to access elements
+ * Implements min-heap tree
+ * Can be used for min priority queue
+ */ 
 template <typename T>
 class HeapTree
 {
