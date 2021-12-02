@@ -1,6 +1,7 @@
 #include <stack>
+#include <stdio.h>
 
-namespace search {
+namespace Search {
 	
 	/* 
 	 * Takes a sorted array, its size and element to search as input and returns an integer as output
@@ -62,7 +63,12 @@ namespace search {
 	 * Should be tested
 	 */
 	template<typename T>
-	int get_less_elements( T* array, int size, T nth_element_to_find ) {
+	T nth_element_in( T* array, int size, T nth_element_to_find ) {
+
+		if( nth_element_to_find <= 0 || nth_element_to_find > size ) {
+			return -1;
+		}
+
 		std::stack< std::pair<int, int> > stack;
 		stack.push(std::make_pair(0, size-1));
 
@@ -70,9 +76,12 @@ namespace search {
 
 			auto range = stack.top();
 			stack.pop();
-
-			T pivot = array[range.second];
 			
+			T pivot = array[range.second];
+
+			if( range.first == range.second ) {
+				return pivot;
+			}			
 			
 			//Partition procedure begin			
 
@@ -90,15 +99,18 @@ namespace search {
 			std::swap(array[partition_index], array[range.second]);
 			//Partition procedure end
 
-			if( partition_index + 1 < nth_element_to_find && range.first < partition_index - 1) {
+			// Number of elements less than or equal to element in the given sub-array
+			int elements_lt_or_eq_pivot = partition_index - range.first + 1; 
+
+			if( elements_lt_or_eq_pivot == nth_element_to_find ) {
+				return array[partition_index];
+			}
+			else if( nth_element_to_find < elements_lt_or_eq_pivot ) {
 				stack.push(std::make_pair(range.first, partition_index - 1));
 			}
-			else if(range.second > partition_index + 1){
+			else{
 				stack.push(std::make_pair(partition_index + 1, range.second));
-				nth_element_to_find -= (partition_index - range.first + 1);
-			}
-			else {
-				return array[partition_index];
+				nth_element_to_find -= elements_lt_or_eq_pivot;
 			}
 
 		}

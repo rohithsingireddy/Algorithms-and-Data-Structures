@@ -95,3 +95,27 @@ int main(){
 	std::cout<<find_set(s[2])->data<<' '<<find_set(s[9])->data;
 }
 */
+
+
+/*Disjoint Set Union
+int s[N]; ll mx[N];
+
+int findParent(int i)
+{
+	if( i == s[i] )
+		return i;
+	return s[i] = findParent(s[i]);
+}
+
+void setUnion(int a, int b, int c){
+	int x = findParent(a);
+	int y = findParent(b);
+	if( x != y ){
+		if( mx[x] > mx[y] )
+			s[y] = x, mx[x] += mx[y];
+		else
+			s[x] = y, mx[y] += mx[x];
+	}
+}
+
+*/
