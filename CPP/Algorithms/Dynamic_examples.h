@@ -112,5 +112,53 @@
 		return strings;
 	} 
 
+	/*
+	 * Longest Non decreasing sub-sequence problem with dynamic programmaing
+	 * Takes a array with comparable items and returns a vector to the longest increasing subsequence
+	 * There is more efficient way with using binary search
+	 */
+	template<typename T>
+	std::vector<T> non_decreasing_subsequence( T* array, int size) {
+
+		int* size_at = new int[size]; // Longest size found till ith index from left
+		int* last_seq_index = new int[size]; // Index of last element before current in an increasing sequence
+		std::vector<T> result;
+
+		for( int i = 0; i < size; i++ ) {
+			size_at[i] = 1;
+			last_seq_index[i] = -1;
+		}
+
+
+		int max_size = -1, max_index = -1;
+
+		for( int i = 1; i < size; i++ ) {
+			for( int j = i - 1; j >= 0; j-- ) {
+				if( array[j] <= array[i] && size_at[j] + 1 > size_at[i] ) {
+					
+					size_at[i] = size_at[j] + 1;
+					last_seq_index[i] = j;
+
+				}
+			}
+			if( max_size < size_at[i] ) {
+				max_size = size_at[i];
+				max_index = i;
+			}
+		}
+
+		while( max_index >= 0 ) {
+			result.push_back(array[max_index]);
+			max_index = last_seq_index[max_index];
+		}
+
+		for( int i = 0, j = result.size() - 1; i < j; i++, j-- ) {
+			std::swap(result[i], result[j]);
+		}
+
+		return result;
+
+	}
+
  }
 

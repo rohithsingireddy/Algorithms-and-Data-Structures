@@ -59,6 +59,9 @@ struct LinkedList
 	 */
 	void remove(LinkedNode<T> *temp)
 	{
+		if( temp == nullptr ) {
+			return;
+		}
 		if (temp == head)
 		{
 			head = head->next;
@@ -75,9 +78,17 @@ struct LinkedList
 		{
 			temp->next->prev = temp->prev;
 			temp->prev->next = temp->next;
-			delete temp;
+			// delete temp;
 		}
 	}
+
+	/*
+	 * Takes a value that is to be removed from the list
+	 * Returns null
+	 */
+	void remove(T value) {
+		remove(search(value));
+	} 
 
 	
 	/*

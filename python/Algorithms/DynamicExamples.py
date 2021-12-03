@@ -57,3 +57,39 @@ def common_subsequence( string_1:str, string_2:str)-> str:
 
     common_string = ''.join([x for x in reversed(common_string)])
     return common_string
+
+
+def non_increasing_subsequence(sequence:list) -> list:
+    '''
+        Takes a sequence with comparable as input
+        Returns a list of longest non-increasing subsequence
+    '''
+    size = len(sequence)
+    last_index_at = [-1 for _ in range(size)] #stores the previous index of sequence current element belongs to
+    size_at = [1 for _ in range(size)] #Stores the size of longest sequence the current element belongs to
+
+    max_index, max_length = -1, -1
+
+    for i in range(1, size):
+        for j in range(i-1, -1, -1):
+            if sequence[j] >= sequence[i] and size_at[j] + 1 > size_at[i]:
+                size_at[i] = size_at[j] + 1
+                last_index_at[i] = j
+        
+        if max_length < size_at[i]:
+            max_length = size_at[i]
+            max_index = i
+    
+    res = list()
+    while max_index >= 0:
+        print(max_index)
+        res.append(sequence[max_index])
+        max_index = last_index_at[max_index]
+    
+    return [x for x in reversed(res)]
+
+
+if __name__ == '__main__':
+    l = input().split()
+    print(non_increasing_subsequence(l))
+
