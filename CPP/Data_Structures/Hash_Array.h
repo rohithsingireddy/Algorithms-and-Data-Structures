@@ -1,4 +1,6 @@
 #include <math.h>
+#include <limits.h>
+#include <stdexcept>
 #include "LinkedList.h"
 
 /* 
@@ -32,6 +34,9 @@ class Hash_Array {
         }
 
         Hash_Array(unsigned long long size) {
+            if( size >= INT64_MAX ) {
+                throw std::invalid_argument("The size cannot be represented\n");
+            }
             max_size = size;
             data = new LinkedList<T>*[max_size];
         }
