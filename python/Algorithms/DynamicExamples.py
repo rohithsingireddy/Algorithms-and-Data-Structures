@@ -1,3 +1,4 @@
+from math import inf
 
 def max_price_for_rod(price_for_length:list):
     '''
@@ -89,7 +90,99 @@ def non_increasing_subsequence(sequence:list) -> list:
     return [x for x in reversed(res)]
 
 
+def solve_knapsack(weights:list, values:list, max_weight:int):
+    '''
+        0-1 Knapsack Problem
+        Takes a list of weights, values, max_weight as input
+        Returns a tuple with max values and a set of weights that are associated with it
+    '''
+    size = len(weights)
+
+    # size by max_weight matrix array. The (i, j)th element represents 
+    # the maximum value using some or all of the first i elements whose 
+    # combined weight is less than or equal to j
+    dp_array = [list() for _ in range(size + 1)]
+    for i in range(size + 1):
+        dp_array[i] = [0 for _ in range(max_weight + 1)]
+
+    for i in range(1, size+1):
+        for weight in range(max_weight+1):
+            if weights[i-1] > weight:
+                dp_array[i][weight] = dp_array[i - 1][weight]
+            else:
+                dp_array[i][weight] = max( dp_array[i - 1][weight], dp_array[i - 1][weight - weights[i - 1]] + values[i - 1])
+    
+    res, weight = -1, max_weight
+    while res <= 0 and weight > 0:
+        res = dp_array[size][weight]
+        weight -= 1
+
+    result = []
+    i, j = size, max_weight
+    while i > 0:
+        if dp_array[i-1][j] < dp_array[i][j]:
+            result.append(weights[i - 1])
+            j -= weights[i - 1]
+        i -= 1
+    
+    return res, result
+
+
+def coin_exchange(coins:list, value:int):
+    '''
+        Coin Exchange problem. Similar to knapsack problem
+        Takes a list of coins and value as input
+        
+        Returns a tuple containing minimum number of coins required to create the value
+        and a dict contiaing info about the chosen coins
+    '''
+    size = len(coins)
+    
+    '''
+        (i, j)th element represents the min coins taken from first i elements
+        that are used to represent sum that is greatest value less than or equal 
+        to j
+    '''
+    dp_array = [None for _ in range(size + 1)]
+    for i in range(size + 1):
+        dp_array[i] = [inf for _ in range(value + 1)]
+        dp_array[i][0] = 0
+
+    for i in range(1, size + 1):
+        for j in range(1, value + 1):
+            if j < coins[i - 1]:
+                dp_array[i][j] = dp_array[i - 1][j]
+            else:
+                dp_array[i][j] = min( dp_array[i - 1][j], dp_array[i][j - coins[i - 1]] + 1)
+
+    result = {}
+    j = value
+    i = size
+    while j > 0 and i > 0:
+        if dp_array[i - 1][j] == dp_array[i][j]:
+            i -= 1
+        else:
+            coin = coins[i - 1]
+            if coin in result:
+                result[coin] += 1
+            else:
+                result[coin] = 1
+            j -= coin
+        
+    # s = 0
+    # for i in result:
+    #     s += (i * result[i])
+    # assert(s == value)
+
+    return dp_array[-1][-1], result
+
+
 if __name__ == '__main__':
-    l = input().split()
-    print(non_increasing_subsequence(l))
+    
+    value = int(input())
+    
+    coins = [int(x) for x in input().split()]
+        
+    print(coin_exchange(coins, value))
+
 
