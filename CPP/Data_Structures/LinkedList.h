@@ -1,6 +1,6 @@
-#include <iostream>
+#include <stdexcept>
 
-template <typename T = int>
+template <typename T>
 struct LinkedNode
 {
 	LinkedNode<T> *prev = nullptr, *next = nullptr;
@@ -8,16 +8,21 @@ struct LinkedNode
 	LinkedNode(T v) : val{v} {}
 };
 
-template <typename T = int>
+template <typename T>
 struct LinkedList
 {
+
+private:
 	LinkedNode<T> *head = nullptr, *tail = nullptr;
+	LinkedNode<T> *current = nullptr;
+
+public:
 	LinkedList() {}
 
 	/*
 	 * Takes a value and inserts it at the end of list
 	 * Returns null
-	 */ 
+	 */
 	void insert(T v)
 	{
 		if (head == nullptr)
@@ -34,7 +39,6 @@ struct LinkedList
 		}
 	}
 
-	
 	/*
 	 * Takes a value and searches for the node that has the value
 	 * Returns the node if present else null
@@ -51,15 +55,14 @@ struct LinkedList
 		return nullptr;
 	}
 
-
-	
 	/*
 	 * Takes a node that is to be removed from the list
 	 * Returns null
 	 */
 	void remove(LinkedNode<T> *temp)
 	{
-		if( temp == nullptr ) {
+		if (temp == nullptr)
+		{
 			return;
 		}
 		if (temp == head)
@@ -86,36 +89,83 @@ struct LinkedList
 	 * Takes a value that is to be removed from the list
 	 * Returns null
 	 */
-	void remove(T value) {
-		remove(search(value));
-	} 
-
-	
-	/*
-	 * Prints the  content of the list in forward
-	 * Returns null
-	 */
-	void print()
+	void remove(T value)
 	{
-		auto temp = head;
-		while (temp)
-		{
-			std::cout << temp->val << ' ';
-			temp = temp->next;
-		}
-		std::cout << '\n';
+		remove(search(value));
 	}
 
-	
+	/*
+	 * Inititalizes current
+	 */
+	void begin_iteration(bool reverse = false)
+	{
+		if (reverse)
+		{
+			current = tail;
+		}
+		else
+		{
+			current = head;
+		}
+	}
+
+	/*
+	 * Returns value of next node in the list
+	 * Throws an runtime_error if next node does not exist
+	 */
+	T next()
+	{
+		// printf("some");
+		LinkedNode<T> *temp = current;
+		if (current != nullptr)
+		{
+			current = current->next;
+		}
+		else
+		{
+			throw std::runtime_error("Trying to use a null pointer");
+		}
+		return temp->val;
+	}
+
+	/*
+	 * Returns value of next node in the list
+	 * Throws an runtime_error if previous node does not exist
+	 */
+	T prev()
+	{
+		// printf("some");
+		LinkedNode<T> *temp = current;
+		if (current != nullptr)
+		{
+			current = current->prev;
+		}
+		else
+		{
+			throw std::runtime_error("Trying to use a null pointer");
+		}
+		return temp->val;
+	}
+
+
+	/*
+	 * Returns true if current reached end while iterating
+	 */
+	bool has_reached_end()
+	{
+		return current == nullptr;
+	}
+
 	/*
 	 * Merges two disjoint list
 	 * Returns the pointer to the list that called this method after merging
+	 * TODO: Some more checks to be done before merging
 	 */
 	LinkedList<T> *merge(LinkedList<T> *b)
 	{
 		if (b->head == nullptr)
 			return this;
-		else if (head == nullptr)
+		else if (head == nullptr || tail == nullptr)
 			return b;
 		else
 		{
