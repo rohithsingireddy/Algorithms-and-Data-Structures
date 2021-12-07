@@ -37,6 +37,13 @@ class DisjointSetTree:
             node.parent = self.find_set(node.parent)
         return node.parent
     
+    def find_parent(self, index:int):
+        '''
+            Takes set index as input
+            Returns the parent of set it belongs to
+        '''
+        return self.find_set(self.nodes[index])
+    
     def union_sets(self, i:int, j:int):
         '''
             Takes indices of sets( indices based on insertion order) as input

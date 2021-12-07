@@ -28,9 +28,6 @@ class Disjoint_Set_Tree
 
 	std::vector<Set_node *> nodes;
 	int size = 0;
-
-public:
-
 	/* 
 	 * Finds the parent node( representative of set it belongs to) 
 	 * of the given node
@@ -41,6 +38,17 @@ public:
 			x->parent = find_set(x->parent);
 		return x->parent;
 	}
+
+public:
+
+	/*
+	 * Returns the data of parent (or representative ) of index'th node
+	 */
+	T find_parent(int index)
+	{
+		return this->find_set(nodes[index])->data;
+	}
+
 
 	/*
 	 * Takes the indices of the sets( indices based on insertion order ) as input
@@ -113,13 +121,4 @@ public:
 		return result;
 	}
 
-
-	/*
-	 * Takes set number as input
-	 * Returns the parent( or representative) of the given set
-	 */
-	T operator[](int set_number) const
-	{
-		return find_set(nodes[set_number])->data;
-	}
 };
