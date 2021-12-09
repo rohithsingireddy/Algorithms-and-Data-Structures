@@ -10,17 +10,17 @@
 #include "Disjoint_Set_Tree.h"
 #include "Fibonnaci_Heap.h"
 
-const int MAX = 1000;
-
 /*
  * Uses pointer based representation of graph
  * Recommended to use reset if trying to use multiple algorithms on same graph object
  * This file is subject to mission creep
+ * Weights cannot be over 1e7 because that is used as MAX for certain member functions
  */
 
 template <typename T>
 class Graph
 {
+
     // Used during traversal
     enum Color
     {
@@ -43,6 +43,8 @@ class Graph
     // Node in graph
     struct Node
     {
+
+        const static int MAX = 1e7;
         //index of the node
         int label;
 
@@ -92,13 +94,22 @@ class Graph
 
         void reset()
         {
-            this->distance_from_source = INT_MAX;
+            this->distance_from_source = this->MAX;
             this->parent_in_traversal = nullptr;
             this->start_step = 0;
             this->end_step = 0;
             this->connected_component_label = -1;
             this->pre_order_number = -1;
         }
+
+        // ~Node()
+        // {
+        //     delete parent_in_traversal;
+        //     for (Node *i : this->adjacent_nodes)
+        //     {
+        //         delete i;
+        //     }
+        // }
     };
 
     int no_of_edges;
@@ -132,7 +143,22 @@ class Graph
             this->weight = other.weight;
             this->type = other.type;
         }
+
+        // ~Edge()
+        // {
+        //     delete from;
+        //     delete to;
+        // }
     };
+
+    std::list<Node *> nodes_topological; // Node indices in topological sorting order
+    Disjoint_Set_Tree<int> component;
+
+    int edge_index = 0;
+    bool is_directed;
+    Node *nodes;
+    //Do not manipulate this. Use get_edges() instead
+    Edge *edges;
 
     /*
      * Helper function for inserting edge
@@ -160,6 +186,9 @@ class Graph
         }
     }
 
+    /*
+     * Helper function to get a copy of edges 
+     */
     std::vector<Edge> get_edges()
     {
         std::vector<Edge> result;
@@ -173,14 +202,27 @@ class Graph
         return result;
     }
 
-    std::list<Node *> nodes_topological; // Node indices in topological sorting order
-    Disjoint_Set_Tree<int> component;
+    /*
+     * Helper function to check if a graph is undirected and
+     * is connected
+     */
+    void check_if_st_possible()
+    {
 
-    int edge_index = 0;
-    bool is_directed;
-    Node *nodes;
-    //Do not manipulate this. Use get_edges() instead
-    Edge *edges;
+        if( this->is_directed )
+        {
+            throw std::runtime_error("Algorithm cannot find spanning tree for directed graph\n");
+        }
+        for( int i = 0; i < this->no_of_nodes; i++ )
+        {
+            if( this->component.find_parent(0) != this->component.find_parent( i ))
+            {
+                throw std::runtime_error("Graph has to be connected to find spanning tree\n");
+            }
+        }        
+    }
+
+
 
 public:
     Graph(int no_of_nodes, int no_of_edges, bool is_directed = true)
@@ -205,6 +247,12 @@ public:
             no_of_type_edges.insert({(Edge_type)i, 0});
         }
     }
+
+    // ~Graph()
+    // {
+    //     delete[] nodes;
+    //     delete[] edges;
+    // }
 
     /*
      * Takes index of from node and to node and weight associated with the edge
@@ -402,6 +450,8 @@ public:
      */
     std::vector<std::pair<int, int>> kruskal_min_spanning_tree()
     {
+        this->check_if_st_possible();
+
         std::vector<std::pair<int, int>> edges;
         Disjoint_Set_Tree<int> nodes_in_tree;
 
@@ -434,12 +484,14 @@ public:
      * with given index'th node as input
      * Returns all the edges( in form of (from, to) repr. )
      * Returns the weight of spanning tree at the end of vector
+     * Due to integer overflows might not work for big values
      */
     std::vector<std::pair<int, int>> prim_min_spanning_tree(int source_index)
     {
-        // TODO: Have to use fibbnacci min_heap
+        this->check_if_st_possible();
+
         std::vector<std::pair<int, int>> result;
-        bool *is_in_spanning_tree = new bool[this->no_of_nodes];
+        bool *is_in_queue = new bool[this->no_of_nodes];
         int *key_of = new int[this->no_of_nodes];
 
         Fibonnaci_Heap<int, Node *> fb_min_heap;
@@ -447,15 +499,15 @@ public:
         {
             if (i != source_index)
             {
-                fb_min_heap.insert(MAX, &(this->nodes[i]));
-                key_of[i] = MAX;
+                fb_min_heap.insert(Node::MAX, &(this->nodes[i]));
+                key_of[i] = Node::MAX;
             }
             else
             {
                 fb_min_heap.insert(0, &(this->nodes[i]));
                 key_of[i] = 0;
             }
-            is_in_spanning_tree[i] = false;
+            is_in_queue[i] = true;
         }
 
         while (!fb_min_heap.is_empty())
@@ -463,31 +515,34 @@ public:
             std::pair<int, Node *> min_node = fb_min_heap.extract_min();
             int key = min_node.first;
             Node *current = min_node.second;
+            is_in_queue[current->label] = false;
 
-            is_in_spanning_tree[current->label] = true;
             for (Node *adj : current->adjacent_nodes)
             {
                 int node_index = adj->label;
                 int edge_index = current->og_edge_indices[node_index];
-                if (!is_in_spanning_tree[node_index] &&
+                
+                if (is_in_queue[node_index] &&
                     this->edges[edge_index].weight < key_of[node_index])
                 {
                     adj->parent_in_traversal = current;
                     key_of[node_index] = this->edges[edge_index].weight;
-                    fb_min_heap.decrease_key(node_index, key_of[node_index]);
+                    fb_min_heap.decrease_key(node_index, this->edges[edge_index].weight);
                 }
             }
+            
         }
 
         int min_spanning_weight = 0;
         for (int u = 0; u < this->no_of_nodes; u++)
         {
-            if (u != source_index)
+            if (u != source_index && nodes[u].parent_in_traversal != nullptr)
             {
                 int v = nodes[u].parent_in_traversal->label;
                 int edge_index = nodes[u].og_edge_indices[v];
-                result.push_back(std::make_pair(u, v));
+                result.push_back(std::make_pair(v, u));
                 min_spanning_weight += this->edges[edge_index].weight;
+                printf("%d\n", key_of[v]);
             }
         }
         result.push_back(std::make_pair(min_spanning_weight, -1));
@@ -502,6 +557,7 @@ public:
      * Takes the index of source node as input
      * Returns true if no negative weight cycle is found in the graph
      * Else false
+     * Due to integer overflows might not work for big values
      */
     bool bellman_ford_path_weights(int source_index)
     {
@@ -514,9 +570,12 @@ public:
             {
                 Node *u = current_edge.from;
                 Node *v = current_edge.to;
-                if (v->distance_from_source > u->distance_from_source + current_edge.weight)
+                int u_dist = u->distance_from_source;
+                int v_dist = v->distance_from_source;
+                int temp_weight = u_dist + current_edge.weight;
+                if (v_dist > temp_weight)
                 {
-                    v->distance_from_source = u->distance_from_source + current_edge.weight;
+                    v->distance_from_source = temp_weight;
                     v->parent_in_traversal = u;
                 }
             }
@@ -539,6 +598,7 @@ public:
      * Dijkstra Algorithm
      * Finds the shortest path of all nodes from the node with source_index
      * Cannot be used on graphs with negative weights
+     * Due to integer overflows might not work for big values
      */
     void djikstra_shortest_path(int source_index)
     {
@@ -547,8 +607,7 @@ public:
         {
             if (i != source_index)
             {
-                fb_min_heap.insert(MAX, &(this->nodes[i]));
-
+                fb_min_heap.insert(Node::MAX, &(this->nodes[i]));
             }
             else
             {
@@ -556,27 +615,30 @@ public:
                 this->nodes[i].distance_from_source = 0;
             }
         }
-        
+
         while (!fb_min_heap.is_empty())
         {
             std::pair<int, Node *> min_node = fb_min_heap.extract_min();
             int key = min_node.first;
             Node *current = min_node.second;
+            int src_dist = current->distance_from_source;
 
             for (Node *adj : current->adjacent_nodes)
             {
                 int edge_index = current->og_edge_indices[adj->label];
                 int weight = this->edges[edge_index].weight;
-                if( weight < 0 )
+                int adj_dist = adj->distance_from_source;
+                if (weight < 0)
                 {
                     throw std::invalid_argument("Cannot use this on a graph with negative weights\n");
                 }
-                if (adj->distance_from_source >
-                    current->distance_from_source + weight)
+
+                int temp_weight = src_dist + weight;
+                if (adj_dist > temp_weight)
                 {
-                    adj->distance_from_source = current->distance_from_source + weight;
-                    
-                    fb_min_heap.decrease_key(adj->label, adj->distance_from_source);
+                    adj->distance_from_source = temp_weight;
+                    adj->parent_in_traversal = current;
+                    fb_min_heap.decrease_key(adj->label, temp_weight);
                 }
             }
         }
@@ -667,8 +729,8 @@ public:
     int get_distance_from_source(int index)
     {
         check_index(index);
-        int k =  this->nodes[index].distance_from_source;
-        if( k >= MAX )
+        int k = this->nodes[index].distance_from_source;
+        if (k >= Node::MAX)
         {
             k = -1;
         }
@@ -700,7 +762,7 @@ public:
     int operator[](int index)
     {
         // check_index(index);
-        return this->get_distance_from_source( index );
+        return this->get_distance_from_source(index);
     }
 
     /*

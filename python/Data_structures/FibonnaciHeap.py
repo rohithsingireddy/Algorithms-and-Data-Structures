@@ -8,8 +8,6 @@ from LinkedList import LinkedList
 class Fib_Node:
     def __init__(self):
         self.parent = None
-        self.left = None # No need
-        self.right = None # No need
         self.children = list()
         self.key = None
         self.data = None
@@ -181,11 +179,8 @@ class FibonacciHeap:
                 self.root_list.addNodeLast(child)
             self.root_list.deleteNode(top)
 
-            if top == top.right:
-                self.min = None
-            else:
-                self.min = top.right
-                self.consolidate()
+            self.min = None
+            self.consolidate()
             key, data = top.key, top.data
         
         self.no_of_nodes -= 1
@@ -224,13 +219,4 @@ class FibonacciHeap:
         self.extract_min()
 
 
-
-    
-if __name__ == '__main__':
-    f = FibonacciHeap()
-    for i in range(5):
-        f.insert(i, "Hello")
-    f.delete_node(2, -1000)
-    while not f.is_empty():
-        print(f.extract_min())
     
