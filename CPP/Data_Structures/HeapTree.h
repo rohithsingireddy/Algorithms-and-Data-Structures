@@ -139,23 +139,29 @@ public:
 	/*
 	 * Remove a value from given index
 	 */
-	void remove(int index) {
-		if( index < 1 || index > heap_size ) {
+	T remove(int index = 1) {
+		if( index < 0 || index > heap_size ) {
 			throw std::runtime_error("Index out of bounds");
 		}
+		T temp = array[index];
 		swap(array[index], array[heap_size--]);
 		min_heapify(index);
+		return temp;
 	}
 
-	/* 
-	 * Prints the content of the array
+	/*
+	 * Returns the root (or minimimum) of the tree
 	 */
-	void print()
+	T root_of_tree()
 	{
-		for (int i = 1; i <= max_size; i++)
-		{
-			std::cout << array[i] << ' ';
-		}
-		std::cout << std::endl;
+		return array[1];
+	}
+
+	/*
+	 * Returns true if the heap is empty
+	 */
+	bool is_empty()
+	{
+		return this->heap_size == 0;
 	}
 };

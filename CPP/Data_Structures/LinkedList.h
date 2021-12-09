@@ -1,5 +1,12 @@
+#ifndef LIST_INCLUDE_GUARD    
+#define LIST_INCLUDE_GUARD
+
+
 #include <stdexcept>
 
+/*
+ * TODO: '=' operator overloading
+ */
 template <typename T>
 struct LinkedNode
 {
@@ -176,3 +183,4 @@ public:
 		}
 	}
 };
+#endif

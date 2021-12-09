@@ -36,24 +36,29 @@ class LinkedList:
         self.tail = node
         self.size += 1
 
-    def deleteNode(self, node):
+    def deleteNode(self, value):
         '''
             Deletes a given node from the list and restructures the list
         '''
+        node = self.searchForNode(value)
         if node == None:
             return
 
         if node == self.head:
             self.head = node.next
-            self.head.prev = None
+            if node.next != None:
+                self.head.prev = None
 
         elif node == self.tail:
             self.tail = node.prev
-            self.tail.next = None
+            if node.prev != None:
+                self.tail.next = None
 
         else:
-            node.next.prev = node.prev
-            node.prev.next = node.next
+            if node.next != None:
+                node.next.prev = node.prev
+            if node.prev != None:
+                node.prev.next = node.next
 
     # Searching for a node with a given value
     # Returns none if value is not found in the linkedlist

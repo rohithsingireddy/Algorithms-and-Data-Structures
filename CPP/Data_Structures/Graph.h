@@ -8,6 +8,15 @@
 #include <functional>
 #include <unordered_map>
 #include "Disjoint_Set_Tree.h"
+#include "Fibonnaci_Heap.h"
+
+const int MAX = 1000;
+
+/*
+ * Uses pointer based representation of graph
+ * Recommended to use reset if trying to use multiple algorithms on same graph object
+ * This file is subject to mission creep
+ */
 
 template <typename T>
 class Graph
@@ -30,27 +39,58 @@ class Graph
         CROSS
     };
 
-
     int no_of_nodes;
     // Node in graph
     struct Node
     {
-        int label; // or index
-        int connected_component_label = -1;
-        int in_degree, out_degree;
-        int start_step, end_step;
-        int pre_order_number = -1;
-        Color color = WHITE;
-        std::vector<Node *> adjacent_nodes;
-        std::unordered_map<int, int> og_edge_indices; //outgoing Edge indices
+        //index of the node
+        int label;
 
+        // Yet to be used
+        int in_degree, out_degree;
+
+        // Used in DFS
+        int start_step, end_step;
+
+        // Used for calculating strongly connected components
+        int pre_order_number = -1;
+        int connected_component_label = -1;
+
+        //Used in DFS and BFS
+        Color color = WHITE;
+
+        std::vector<Node *> adjacent_nodes;
+
+        //outgoing Edge indices
+        std::unordered_map<int, int> og_edge_indices;
+
+        //Calculated in both DFS and BFS
         Node *parent_in_traversal = nullptr;
+
+        //Calculated in DFS, BFS and Djikistra
         int distance_from_source = INT_MAX;
 
         T data;
 
+        //Used for min-heap-tree in prim spanning tree
+        bool operator<(const Node other)
+        {
+            return this->distance_from_source < other.distance_from_source;
+        }
 
-        void reset() 
+        void operator=(const Node other)
+        {
+            this->distance_from_source = other.distance_from_source;
+            this->parent_in_traversal = other.parent_in_traversal;
+            this->start_step = other.start_step;
+            this->end_step = other.end_step;
+            this->connected_component_label = other.connected_component_label;
+            this->pre_order_number = other.pre_order_number;
+
+            this->data = other.data;
+        }
+
+        void reset()
         {
             this->distance_from_source = INT_MAX;
             this->parent_in_traversal = nullptr;
@@ -80,11 +120,13 @@ class Graph
             this->reverse_edge = reverse_edge;
         }
 
-        bool operator<(const Edge& other) const {
+        bool operator<(const Edge &other) const
+        {
             return weight < other.weight;
         }
 
-        void operator=(const Edge& other) {
+        void operator=(const Edge &other)
+        {
             this->from = other.from;
             this->to = other.to;
             this->weight = other.weight;
@@ -121,9 +163,9 @@ class Graph
     std::vector<Edge> get_edges()
     {
         std::vector<Edge> result;
-        for( int i = 0; i < this->no_of_edges; i++ )
+        for (int i = 0; i < this->no_of_edges; i++)
         {
-            if( !this->edges[i].reverse_edge )
+            if (!this->edges[i].reverse_edge)
             {
                 result.push_back(edges[i]);
             }
@@ -158,7 +200,7 @@ public:
         }
         edges = new Edge[this->no_of_edges];
 
-        for( int i = 0; i < 4; i++ )
+        for (int i = 0; i < 4; i++)
         {
             no_of_type_edges.insert({(Edge_type)i, 0});
         }
@@ -186,6 +228,7 @@ public:
     /*
      * Resets distances and parents of each node (Required for BFS)
      * Resets start_step and end_step of each node(Required for DFS)
+     * Resets connected_component_label of each node( Required for finding Strongly connected components)
      */
     void reset()
     {
@@ -256,17 +299,17 @@ public:
                     adj->parent_in_traversal = current;
                     visit_node(adj);
                 }
-                else if( adj->color == GRAY )
+                else if (adj->color == GRAY)
                 {
                     type = BACK;
-                    if( sort_topologically )
+                    if (sort_topologically)
                     {
                         throw std::runtime_error("Cannot find topological sort for a graph with a cycle");
                     }
                 }
                 else
                 {
-                    if( current->start_step < adj->start_step )
+                    if (current->start_step < adj->start_step)
                     {
                         type = FORWARD;
                     }
@@ -297,7 +340,6 @@ public:
         }
     }
 
-
     /*
      * Finds the strongly connected components of the graph using
      * Path based strong component algorithm
@@ -306,33 +348,33 @@ public:
     {
         int counter = 0;
         int index_of_cc = 0; // Index for connected components
-        std::stack<Node*> unassigned, different;
+        std::stack<Node *> unassigned, different;
 
-        std::function<void(Node*)> visit_node = 
-        [&counter, &visit_node, &unassigned, &different,
-        &index_of_cc](Node* current)
+        std::function<void(Node *)> visit_node =
+            [&counter, &visit_node, &unassigned, &different,
+             &index_of_cc](Node *current)
         {
             current->pre_order_number = counter++;
             unassigned.push(current);
             different.push(current);
-            for( Node* adj: current->adjacent_nodes )
+            for (Node *adj : current->adjacent_nodes)
             {
-                if( adj->pre_order_number == -1 )
+                if (adj->pre_order_number == -1)
                 {
                     // Tree Edge
                     visit_node(adj);
                 }
-                else if( adj->connected_component_label == -1 )
+                else if (adj->connected_component_label == -1)
                 {
-                    while( different.top()->pre_order_number > adj->pre_order_number)
+                    while (different.top()->pre_order_number > adj->pre_order_number)
                     {
                         different.pop();
                     }
                 }
             }
-            if( current == different.top() )
+            if (current == different.top())
             {
-                while( unassigned.top() != current )
+                while (unassigned.top() != current)
                 {
                     unassigned.top()->connected_component_label = index_of_cc;
                     unassigned.pop();
@@ -343,15 +385,14 @@ public:
             }
         };
 
-        for( int i = 0; i < this->no_of_nodes; i++ )
+        for (int i = 0; i < this->no_of_nodes; i++)
         {
-            if( nodes[i].pre_order_number == -1 )
+            if (nodes[i].pre_order_number == -1)
             {
                 visit_node(&nodes[i]);
             }
         }
     }
-
 
     /*
      * Minimum Spanning Tree using Kruskal Algorithm
@@ -363,28 +404,182 @@ public:
     {
         std::vector<std::pair<int, int>> edges;
         Disjoint_Set_Tree<int> nodes_in_tree;
-        
-        for( int i = 0; i < this->no_of_nodes; i++ )
+
+        for (int i = 0; i < this->no_of_nodes; i++)
         {
             nodes_in_tree.insert(i);
         }
         auto temp_edges = this->get_edges();
 
-        std::sort( temp_edges.begin(), temp_edges.end());
+        std::sort(temp_edges.begin(), temp_edges.end());
         int min_weight = 0;
-        for( auto i: temp_edges )
+        for (auto i : temp_edges)
         {
             int u_label = i.from->label;
             int v_label = i.to->label;
-            if( nodes_in_tree.find_parent(u_label) != nodes_in_tree.find_parent(v_label) )
+            if (nodes_in_tree.find_parent(u_label) != nodes_in_tree.find_parent(v_label))
             {
                 edges.push_back(std::make_pair(u_label, v_label));
                 min_weight += i.weight;
                 nodes_in_tree.union_set(u_label, v_label);
-            }   
+            }
         }
         edges.push_back(std::make_pair(min_weight, -1));
         return edges;
+    }
+
+    /*
+     * Prim's spanning tree algorithm
+     * Takes a source index and creates a min spanning tree 
+     * with given index'th node as input
+     * Returns all the edges( in form of (from, to) repr. )
+     * Returns the weight of spanning tree at the end of vector
+     */
+    std::vector<std::pair<int, int>> prim_min_spanning_tree(int source_index)
+    {
+        // TODO: Have to use fibbnacci min_heap
+        std::vector<std::pair<int, int>> result;
+        bool *is_in_spanning_tree = new bool[this->no_of_nodes];
+        int *key_of = new int[this->no_of_nodes];
+
+        Fibonnaci_Heap<int, Node *> fb_min_heap;
+        for (int i = 0; i < this->no_of_nodes; i++)
+        {
+            if (i != source_index)
+            {
+                fb_min_heap.insert(MAX, &(this->nodes[i]));
+                key_of[i] = MAX;
+            }
+            else
+            {
+                fb_min_heap.insert(0, &(this->nodes[i]));
+                key_of[i] = 0;
+            }
+            is_in_spanning_tree[i] = false;
+        }
+
+        while (!fb_min_heap.is_empty())
+        {
+            std::pair<int, Node *> min_node = fb_min_heap.extract_min();
+            int key = min_node.first;
+            Node *current = min_node.second;
+
+            is_in_spanning_tree[current->label] = true;
+            for (Node *adj : current->adjacent_nodes)
+            {
+                int node_index = adj->label;
+                int edge_index = current->og_edge_indices[node_index];
+                if (!is_in_spanning_tree[node_index] &&
+                    this->edges[edge_index].weight < key_of[node_index])
+                {
+                    adj->parent_in_traversal = current;
+                    key_of[node_index] = this->edges[edge_index].weight;
+                    fb_min_heap.decrease_key(node_index, key_of[node_index]);
+                }
+            }
+        }
+
+        int min_spanning_weight = 0;
+        for (int u = 0; u < this->no_of_nodes; u++)
+        {
+            if (u != source_index)
+            {
+                int v = nodes[u].parent_in_traversal->label;
+                int edge_index = nodes[u].og_edge_indices[v];
+                result.push_back(std::make_pair(u, v));
+                min_spanning_weight += this->edges[edge_index].weight;
+            }
+        }
+        result.push_back(std::make_pair(min_spanning_weight, -1));
+        return result;
+    }
+
+    /*
+     * Bellman Ford Algorithm
+     * Returns the shortest path from source to other nodes in case of different integer weights
+     * It is impossible to have shortest path between nodes in graphs with negative weight cycles
+     * So, the algorithm checks for that
+     * Takes the index of source node as input
+     * Returns true if no negative weight cycle is found in the graph
+     * Else false
+     */
+    bool bellman_ford_path_weights(int source_index)
+    {
+        nodes[source_index].distance_from_source = 0;
+        std::vector<Edge> temp_edges = this->get_edges();
+
+        for (int i = 1; i < this->no_of_nodes; i++)
+        {
+            for (Edge current_edge : temp_edges)
+            {
+                Node *u = current_edge.from;
+                Node *v = current_edge.to;
+                if (v->distance_from_source > u->distance_from_source + current_edge.weight)
+                {
+                    v->distance_from_source = u->distance_from_source + current_edge.weight;
+                    v->parent_in_traversal = u;
+                }
+            }
+        }
+
+        for (Edge current_edge : temp_edges)
+        {
+            Node *u = current_edge.from;
+            Node *v = current_edge.to;
+            if (v->distance_from_source > u->distance_from_source + current_edge.weight)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /*
+     * Dijkstra Algorithm
+     * Finds the shortest path of all nodes from the node with source_index
+     * Cannot be used on graphs with negative weights
+     */
+    void djikstra_shortest_path(int source_index)
+    {
+        Fibonnaci_Heap<int, Node *> fb_min_heap;
+        for (int i = 0; i < this->no_of_nodes; i++)
+        {
+            if (i != source_index)
+            {
+                fb_min_heap.insert(MAX, &(this->nodes[i]));
+
+            }
+            else
+            {
+                fb_min_heap.insert(0, &(this->nodes[i]));
+                this->nodes[i].distance_from_source = 0;
+            }
+        }
+        
+        while (!fb_min_heap.is_empty())
+        {
+            std::pair<int, Node *> min_node = fb_min_heap.extract_min();
+            int key = min_node.first;
+            Node *current = min_node.second;
+
+            for (Node *adj : current->adjacent_nodes)
+            {
+                int edge_index = current->og_edge_indices[adj->label];
+                int weight = this->edges[edge_index].weight;
+                if( weight < 0 )
+                {
+                    throw std::invalid_argument("Cannot use this on a graph with negative weights\n");
+                }
+                if (adj->distance_from_source >
+                    current->distance_from_source + weight)
+                {
+                    adj->distance_from_source = current->distance_from_source + weight;
+                    
+                    fb_min_heap.decrease_key(adj->label, adj->distance_from_source);
+                }
+            }
+        }
     }
 
     /*
@@ -425,15 +620,15 @@ public:
      */
     std::vector<int> get_topologically_sorted_order()
     {
-        
-        if( this->no_of_type_edges[BACK] != 0 )
+
+        if (this->no_of_type_edges[BACK] != 0)
         {
             throw std::runtime_error("Topological sorting does not exist for cyclic graph");
         }
         std::vector<int> result;
-        for( Node* current: this->nodes_topological )
+        for (Node *current : this->nodes_topological)
         {
-            result.push_back(current->label);   
+            result.push_back(current->label);
         }
         return result;
     }
@@ -441,7 +636,7 @@ public:
     /*
      * Returns true if node with from index can reach the node with to index
      */
-    bool can_reach( int from, int to)
+    bool can_reach(int from, int to)
     {
         check_index(from);
         check_index(to);
@@ -466,14 +661,18 @@ public:
         return nodes[index].data;
     }
 
-
     /*
      * Returns the distance from a source on which breadth_traversal is called
      */
     int get_distance_from_source(int index)
     {
-        this->check_index(index);
-        return nodes[index].distance_from_source;
+        check_index(index);
+        int k =  this->nodes[index].distance_from_source;
+        if( k >= MAX )
+        {
+            k = -1;
+        }
+        return k;
     }
 
     /*
@@ -481,7 +680,7 @@ public:
      */
     std::pair<int, int> get_start_and_end_steps(int index)
     {
-        this->check_index(index);
+        check_index(index);
         return std::make_pair(nodes[index].start_step, nodes[index].end_step);
     }
 
@@ -490,22 +689,24 @@ public:
      */
     int get_strongly_connected_component(int index)
     {
-        this->check_index(index);
+        check_index(index);
         return nodes[index].connected_component_label;
     }
     /*
-     * Returns the distance from a source on which breadth_traversal is called
+     * Returns the distance from a source on which 
+     * breadth_traversal or depth_traversal or dijkstra_shortestpath 
+     * is called
      */
-    int operator[](int index) const
+    int operator[](int index)
     {
-        this->check_index(index);
-        return nodes[index].distance_from_source;
+        // check_index(index);
+        return this->get_distance_from_source( index );
     }
 
     /*
      * Returns the start and end steps for a node after depth_traversal is called
      */
-    std::pair<int, int> operator()(int index) const
+    std::pair<int, int> operator()(int index)
     {
         if (index >= this->no_of_nodes)
         {
@@ -513,5 +714,4 @@ public:
         }
         return std::make_pair(nodes[index].start_step, nodes[index].end_step);
     }
-
 };
