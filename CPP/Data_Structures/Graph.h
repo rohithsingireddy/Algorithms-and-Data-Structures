@@ -15,6 +15,7 @@
  * Recommended to use reset if trying to use multiple algorithms on same graph object
  * This file is subject to mission creep
  * Weights cannot be over 1e7 because that is used as MAX for certain member functions
+ * Susceptible to system breaking memory leaks
  */
 
 template <typename T>
@@ -45,7 +46,7 @@ class Graph
     {
 
         const static int MAX = 1e7;
-        //index of the node
+        // index of the node
         int label;
 
         // Yet to be used
@@ -58,23 +59,23 @@ class Graph
         int pre_order_number = -1;
         int connected_component_label = -1;
 
-        //Used in DFS and BFS
+        // Used in DFS and BFS
         Color color = WHITE;
 
         std::vector<Node *> adjacent_nodes;
 
-        //outgoing Edge indices
+        // outgoing Edge indices
         std::unordered_map<int, int> og_edge_indices;
 
-        //Calculated in both DFS and BFS
+        // Calculated in both DFS and BFS
         Node *parent_in_traversal = nullptr;
 
-        //Calculated in DFS, BFS and Djikistra
+        // Calculated in DFS, BFS and Djikistra
         int distance_from_source = INT_MAX;
 
         T data;
 
-        //Used for min-heap-tree in prim spanning tree
+        // Used for min-heap-tree in prim spanning tree
         bool operator<(const Node other)
         {
             return this->distance_from_source < other.distance_from_source;
@@ -101,15 +102,6 @@ class Graph
             this->connected_component_label = -1;
             this->pre_order_number = -1;
         }
-
-        // ~Node()
-        // {
-        //     delete parent_in_traversal;
-        //     for (Node *i : this->adjacent_nodes)
-        //     {
-        //         delete i;
-        //     }
-        // }
     };
 
     int no_of_edges;
@@ -143,12 +135,6 @@ class Graph
             this->weight = other.weight;
             this->type = other.type;
         }
-
-        // ~Edge()
-        // {
-        //     delete from;
-        //     delete to;
-        // }
     };
 
     std::list<Node *> nodes_topological; // Node indices in topological sorting order
@@ -157,8 +143,11 @@ class Graph
     int edge_index = 0;
     bool is_directed;
     Node *nodes;
-    //Do not manipulate this. Use get_edges() instead
+    // Do not manipulate this. Use get_edges() instead
     Edge *edges;
+
+    // For shortest paths
+    std::vector<std::vector<int>> predecessor, short_path_weights;
 
     /*
      * Helper function for inserting edge
@@ -166,11 +155,11 @@ class Graph
      */
     void insert_single_edge(int from, int to, int weight, bool reverse_edge = false)
     {
-        nodes[from].adjacent_nodes.push_back(&nodes[to]);
-        nodes[from].out_degree++;
-        nodes[to].in_degree++;
-        nodes[from].og_edge_indices.insert({to, edge_index});
-        edges[edge_index++].insert(&nodes[from], &nodes[to], weight, reverse_edge);
+        this->nodes[from].adjacent_nodes.push_back(&nodes[to]);
+        this->nodes[from].out_degree++;
+        this->nodes[to].in_degree++;
+        this->nodes[from].og_edge_indices.insert({to, edge_index});
+        this->edges[edge_index++].insert(&nodes[from], &nodes[to], weight, reverse_edge);
 
         component.union_set(from, to);
     }
@@ -187,7 +176,7 @@ class Graph
     }
 
     /*
-     * Helper function to get a copy of edges 
+     * Helper function to get a copy of edges
      */
     std::vector<Edge> get_edges()
     {
@@ -203,26 +192,54 @@ class Graph
     }
 
     /*
+     * Returns the matrix representation of edges of graph
+     * with weights.
+     * Uses nodes labels for matrix indices
+     */
+    std::vector<std::vector<int>> get_edges_matrix()
+    {
+        std::vector<std::vector<int>> matrix(this->no_of_edges, std::vector<int>(this->no_of_edges));
+
+        for (int i = 0; i < this->no_of_nodes; i++)
+        {
+            for (int j = 0; j < this->no_of_nodes; j++)
+            {
+                matrix[i][j] = (i == j) ? 0 : Node::MAX;
+            }
+        }
+
+        std::vector<Edge> edges = this->get_edges();
+
+        for (Edge edge : edges)
+        {
+            int u = edge.from->label;
+            int v = edge.to->label;
+
+            matrix[u][v] = edge.weight;
+        }
+
+        return matrix;
+    }
+
+    /*
      * Helper function to check if a graph is undirected and
      * is connected
      */
     void check_if_st_possible()
     {
 
-        if( this->is_directed )
+        if (this->is_directed)
         {
             throw std::runtime_error("Algorithm cannot find spanning tree for directed graph\n");
         }
-        for( int i = 0; i < this->no_of_nodes; i++ )
+        for (int i = 0; i < this->no_of_nodes; i++)
         {
-            if( this->component.find_parent(0) != this->component.find_parent( i ))
+            if (this->component.find_parent(0) != this->component.find_parent(i))
             {
                 throw std::runtime_error("Graph has to be connected to find spanning tree\n");
             }
-        }        
+        }
     }
-
-
 
 public:
     Graph(int no_of_nodes, int no_of_edges, bool is_directed = true)
@@ -246,13 +263,22 @@ public:
         {
             no_of_type_edges.insert({(Edge_type)i, 0});
         }
+
+        this->predecessor.resize(this->no_of_nodes);
+        this->short_path_weights.resize(this->no_of_nodes);
+
+        for (int i = 0; i < this->no_of_nodes; i++)
+        {
+            this->predecessor[i].resize(this->no_of_nodes, -1);
+            this->short_path_weights[i].resize(this->no_of_nodes, 0);
+        }
     }
 
-    // ~Graph()
-    // {
-    //     delete[] nodes;
-    //     delete[] edges;
-    // }
+    ~Graph()
+    {
+        delete[] nodes;
+        delete[] edges;
+    }
 
     /*
      * Takes index of from node and to node and weight associated with the edge
@@ -277,6 +303,7 @@ public:
      * Resets distances and parents of each node (Required for BFS)
      * Resets start_step and end_step of each node(Required for DFS)
      * Resets connected_component_label of each node( Required for finding Strongly connected components)
+     * Resets predecessor and shortest path matrices
      */
     void reset()
     {
@@ -480,11 +507,12 @@ public:
 
     /*
      * Prim's spanning tree algorithm
-     * Takes a source index and creates a min spanning tree 
+     * Takes a source index and creates a min spanning tree
      * with given index'th node as input
      * Returns all the edges( in form of (from, to) repr. )
      * Returns the weight of spanning tree at the end of vector
-     * Due to integer overflows might not work for big values
+     * Fib heap can be replaced with another min-priority queue that provides decrese method
+     * Segmentation fault for some inputs
      */
     std::vector<std::pair<int, int>> prim_min_spanning_tree(int source_index)
     {
@@ -515,22 +543,21 @@ public:
             std::pair<int, Node *> min_node = fb_min_heap.extract_min();
             int key = min_node.first;
             Node *current = min_node.second;
-            is_in_queue[current->label] = false;
+            is_in_queue[current->label] = false; // Segmentation fault occurs here
 
             for (Node *adj : current->adjacent_nodes)
             {
                 int node_index = adj->label;
                 int edge_index = current->og_edge_indices[node_index];
-                
+
                 if (is_in_queue[node_index] &&
                     this->edges[edge_index].weight < key_of[node_index])
                 {
                     adj->parent_in_traversal = current;
                     key_of[node_index] = this->edges[edge_index].weight;
-                    fb_min_heap.decrease_key(node_index, this->edges[edge_index].weight);
+                    fb_min_heap.decrease_key(node_index, key_of[node_index]);
                 }
             }
-            
         }
 
         int min_spanning_weight = 0;
@@ -598,7 +625,8 @@ public:
      * Dijkstra Algorithm
      * Finds the shortest path of all nodes from the node with source_index
      * Cannot be used on graphs with negative weights
-     * Due to integer overflows might not work for big values
+     * Segmentation fault for some inputs. Don't know why
+     *
      */
     void djikstra_shortest_path(int source_index)
     {
@@ -621,7 +649,7 @@ public:
             std::pair<int, Node *> min_node = fb_min_heap.extract_min();
             int key = min_node.first;
             Node *current = min_node.second;
-            int src_dist = current->distance_from_source;
+            int src_dist = current->distance_from_source; // Segment Fault happens here
 
             for (Node *adj : current->adjacent_nodes)
             {
@@ -645,9 +673,141 @@ public:
     }
 
     /*
+     * FloydWarshall Algorithm
+     * Updates the short path weights and predecessor matrix
+     * Returns the short path weights in a vector matrix
+     */
+    std::vector<std::vector<int>> floyd_all_shortest_path()
+    {
+        auto matrix = this->get_edges_matrix();
+        int n = this->no_of_nodes;
+
+        std::vector<std::vector<int>> short_paths(n, std::vector<int>(n, 1e7)); //Won't compile with node::MAX
+        std::vector<std::vector<int>> pred(n, std::vector<int>(n, -1));
+
+        for (int i = 0; i < n; ++i)
+        {
+            short_paths[i][i] = 0;
+        }
+
+        for (Edge i : this->get_edges())
+        {
+            int u = i.from->label;
+            int v = i.to->label;
+
+            short_paths[u][v] = i.weight;
+            pred[u][v] = u;
+        }
+
+        for (int k = 0; k < n; k++)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    if (i != j)
+                    {
+                        int temp_weight = short_paths[i][k] + short_paths[k][j];
+                        if (short_paths[i][j] > temp_weight)
+                        {
+                            short_paths[i][j] = temp_weight;
+                            pred[i][j] = pred[k][j];
+                        }
+                    }
+                }
+            }
+        }
+        this->short_path_weights = short_paths;
+        this->predecessor = pred;
+        return short_paths;
+    }
+
+    /*
+     * All pair shortest path
+     * Updates the shortest weights and predecessor matrix
+     * Returns the updated shortest weights in a vector matrix
+     */
+    std::vector<std::vector<int>> all_pair_shortest_paths()
+    {
+        auto matrix = this->get_edges_matrix();
+        int n = this->no_of_nodes;
+
+        std::vector<std::vector<int>> short_paths(n, std::vector<int>(n, 1e7)); // Won't compile with Node::MAX
+        std::vector<std::vector<int>> temp_weights(n, std::vector<int>(n));
+
+        std::vector<std::vector<int>> pred(n, std::vector<int>(n, -1));
+        std::vector<std::vector<int>> temp_pred(n, std::vector<int>(n, -1));
+
+        for (int i = 0; i < n; ++i)
+        {
+            short_paths[i][i] = 0;
+        }
+
+        for (Edge i : this->get_edges())
+        {
+            int u = i.from->label;
+            int v = i.to->label;
+
+            short_paths[u][v] = i.weight;
+            pred[u][v] = u;
+        }
+
+        for (int ii = 1; ii < n - 1; ii *= 2)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    temp_weights[i][j] = (i == j) ? 0 : Node::MAX;
+                    for (int k = 0; k < n; k++)
+                    {
+                        int temp = short_paths[i][k] + short_paths[k][j];
+                        if (temp < temp_weights[i][j])
+                        {
+                            temp_weights[i][j] = temp;
+                            temp_pred[i][j] = (pred[i][j] == -1) ? k : pred[i][j];
+                        }
+                    }
+                }
+            }
+            short_paths = temp_weights;
+            pred = temp_pred;
+        }
+        this->short_path_weights = short_paths;
+        this->predecessor = pred;
+        return pred;
+    }
+
+    /*
+     * Path due to predecessor matrix
+     * Returns all the indices between the path in a vector
+     * Should check if it terminates for more inputs
+     * Seems to work for both floyd warshall and all pair shortest path predecessor matrices
+     */
+    std::deque<int> get_shortest_path(int source, int dest)
+    {
+        this->check_index(source);
+        this->check_index(dest);
+
+        if (this->predecessor[source][dest] == -1)
+        {
+            return std::deque<int>();
+        }
+
+        std::deque<int> result;
+        int current = dest;
+        while (current != -1)
+        {
+            result.push_front(current);
+            current = this->predecessor[source][current];
+        }
+        return result;
+    }
+
+    /*
      * Returns the nodes between the from index node and to index node
      * Shoulb be called after running breadth_traversal on node with 'from' index
-     * Can also be used to find nodes in path of depth-first tree provided both belong 
+     * Can also be used to find nodes in path of depth-first tree provided both belong
      * to the same tree
      * TODO: Perform checks to see if two nodes belong to same depth-first tree
      */
@@ -694,6 +854,10 @@ public:
         }
         return result;
     }
+
+    /*
+     *
+     */
 
     /*
      * Returns true if node with from index can reach the node with to index
@@ -755,13 +919,13 @@ public:
         return nodes[index].connected_component_label;
     }
     /*
-     * Returns the distance from a source on which 
-     * breadth_traversal or depth_traversal or dijkstra_shortestpath 
+     * Returns the distance from a source on which
+     * breadth_traversal or depth_traversal or dijkstra_shortestpath
      * is called
      */
     int operator[](int index)
     {
-        // check_index(index);
+        check_index(index);
         return this->get_distance_from_source(index);
     }
 
@@ -770,10 +934,7 @@ public:
      */
     std::pair<int, int> operator()(int index)
     {
-        if (index >= this->no_of_nodes)
-        {
-            throw std::invalid_argument("Index out of bounds");
-        }
+        check_index(index);
         return std::make_pair(nodes[index].start_step, nodes[index].end_step);
     }
 };

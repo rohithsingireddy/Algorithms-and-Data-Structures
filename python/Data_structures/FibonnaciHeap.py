@@ -3,12 +3,14 @@ from LinkedList import LinkedList
 
 '''
     The logic is wrong but it works for small inputs
+    Somewhat different from cpp implementation
+    TODO: Implement bound checks
 '''
 
 class Fib_Node:
     def __init__(self):
         self.parent = None
-        self.children = list()
+        self.children = set()
         self.key = None
         self.data = None
         self.degree = 0
@@ -48,7 +50,7 @@ class FibonacciHeap:
             based on their keys
         '''
         self.root_list.deleteNode(child)
-        parent.children.append(child)
+        parent.children.add(child)
         child.parent = parent
         parent.degree += 1
         child.mark = False
@@ -121,7 +123,7 @@ class FibonacciHeap:
         '''
             Pseudo bound checking for node dict
         '''
-        if index >= self.index:
+        if not index in self.node_dict:
             raise Exception("Index out of range")
     
 
@@ -215,8 +217,8 @@ class FibonacciHeap:
             Deleting node is best done in program that uses 
             this class. 
         '''
+        self.check_index(node_index)
         self.decrease_key(node_index, lowest_key_possible)
         self.extract_min()
 
 
-    
