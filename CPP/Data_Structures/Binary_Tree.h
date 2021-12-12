@@ -179,13 +179,13 @@ namespace Data_Structures
 		~Binary_Tree()
 		{
 			std::function<void(binary_node*)> delete_node = 
-			[&delete_node](binary_node* current) -> void
+			[&delete_node, this](binary_node* current) -> void
 			{
 				if( current != nullptr )
 				{
 					delete_node(current->left);
 					delete_node(current->right);
-					delete current;
+					this->remove(current);
 				}
 			};
 

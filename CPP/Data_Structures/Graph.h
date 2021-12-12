@@ -70,16 +70,10 @@ class Graph
         // Calculated in both DFS and BFS
         Node *parent_in_traversal = nullptr;
 
-        // Calculated in DFS, BFS and Djikistra
+        // Calculated in DFS, BFS, Bellman-Ford and Djikistra
         int distance_from_source = INT_MAX;
 
         T data;
-
-        // Used for min-heap-tree in prim spanning tree
-        bool operator<(const Node other)
-        {
-            return this->distance_from_source < other.distance_from_source;
-        }
 
         void operator=(const Node other)
         {
