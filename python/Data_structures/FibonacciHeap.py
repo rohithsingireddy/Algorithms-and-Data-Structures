@@ -4,6 +4,7 @@ from LinkedList import LinkedList
 '''
     The logic is wrong but it works for small inputs
     Somewhat different from cpp implementation
+    Program terminates but I have yet to verify the correctness of the program
     TODO: Implement bound checks
 '''
 
@@ -88,25 +89,30 @@ class FibonacciHeap:
             Helper function to maintain the heap rule
             in the tree after extracting the min node
         '''
-        n = ceil(log(self.no_of_nodes, 2) + 1)
-        array = [None for _ in range(n)]
+        degree_dict = {}
         for current in self.root_list:
             
             current_degree = current.degree
-            while array[current_degree] != None:
-                another_node = array[current_degree]
+            if current_degree not in degree_dict:
+                degree_dict[current_degree] = None
+            
+            while degree_dict[current_degree] != None:
+                another_node = degree_dict[current_degree]
                 
                 if current.key > another_node.key:
                     current, another_node = another_node, current
                 
                 self.link(another_node, current)
-                array[current_degree] = None
+                degree_dict[current_degree] = None
+                
                 current_degree += 1
+                if current_degree not in degree_dict:
+                    degree_dict[current_degree] = None
             
-            array[current_degree] = current
+            degree_dict[current_degree] = current
         
         self.min = None
-        for current in array:
+        for current in degree_dict.values():
             if current != None:
                 if self.min == None:
                     self.root_list = LinkedList()

@@ -560,10 +560,9 @@ public:
             if (u != source_index && nodes[u].parent_in_traversal != nullptr)
             {
                 int v = nodes[u].parent_in_traversal->label;
-                int edge_index = nodes[u].og_edge_indices[v];
+                int edge_index = nodes[v].og_edge_indices[u];
                 result.push_back(std::make_pair(v, u));
                 min_spanning_weight += this->edges[edge_index].weight;
-                printf("%d\n", key_of[v]);
             }
         }
         result.push_back(std::make_pair(min_spanning_weight, -1));
@@ -578,6 +577,7 @@ public:
      * Takes the index of source node as input
      * Returns true if no negative weight cycle is found in the graph
      * Else false
+     * Only works for directed graphs
      * Due to integer overflows might not work for big values
      */
     bool bellman_ford_path_weights(int source_index)
@@ -620,7 +620,7 @@ public:
      * Finds the shortest path of all nodes from the node with source_index
      * Cannot be used on graphs with negative weights
      * Segmentation fault for some inputs. Don't know why
-     *
+     * Only works for undirected graphs
      */
     void djikstra_shortest_path(int source_index)
     {
@@ -673,7 +673,7 @@ public:
      */
     std::vector<std::vector<int>> floyd_all_shortest_path()
     {
-        auto matrix = this->get_edges_matrix();
+        //auto matrix = this->get_edges_matrix();
         int n = this->no_of_nodes;
 
         std::vector<std::vector<int>> short_paths(n, std::vector<int>(n, 1e7)); //Won't compile with node::MAX
@@ -755,7 +755,7 @@ public:
                     temp_weights[i][j] = (i == j) ? 0 : Node::MAX;
                     for (int k = 0; k < n; k++)
                     {
-                        int temp = short_paths[i][k] + short_paths[k][j];
+                        int temp = short_paths[i][k] + matrix[k][j];
                         if (temp < temp_weights[i][j])
                         {
                             temp_weights[i][j] = temp;
@@ -777,6 +777,7 @@ public:
      * Returns all the indices between the path in a vector
      * Should check if it terminates for more inputs
      * Seems to work for both floyd warshall and all pair shortest path predecessor matrices
+     * Note: Might loop forever if same vertex loop paths are in input
      */
     std::deque<int> get_shortest_path(int source, int dest)
     {
@@ -803,7 +804,6 @@ public:
      * Shoulb be called after running breadth_traversal on node with 'from' index
      * Can also be used to find nodes in path of depth-first tree provided both belong
      * to the same tree
-     * TODO: Perform checks to see if two nodes belong to same depth-first tree
      */
     std::vector<int> nodes_in_path(int from, int to)
     {
@@ -850,10 +850,6 @@ public:
     }
 
     /*
-     *
-     */
-
-    /*
      * Returns true if node with from index can reach the node with to index
      */
     bool can_reach(int from, int to)
@@ -869,6 +865,7 @@ public:
      */
     void update_node(int index, T data)
     {
+        check_index(index);
         nodes[index].data = data;
     }
 
@@ -878,6 +875,7 @@ public:
      */
     T get_value_at_node(int index)
     {
+        check_index(index);
         return nodes[index].data;
     }
 
