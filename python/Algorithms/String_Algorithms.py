@@ -6,7 +6,9 @@ def rabin_karp_matching(
         max_char: int = 256,
         prime: int = 999983) -> bool:
     '''
-        Pattern matching in a string using rabin karp algorithm
+        Pattern matching in a string using rabin karp algorithm.
+        Takes a text and pattern as input and returns true
+        if the pattern occurs in string
     '''
     if len(text) < len(pattern):
         raise ValueError("Text cannot be less than pattern")
@@ -81,10 +83,3 @@ def kmp_matcher(text:str, pattern:str) -> list:
     
     return result
 
-
-if __name__ == "__main__":
-    s = input()
-    p = input()
-    for i in kmp_matcher(s, p):
-        print(i)
-        assert( s[i:(i+len(p))] == p )

@@ -69,7 +69,7 @@ namespace Data_Structures
 
 			if (cur == nullptr)
 			{
-				throw std::runtime_error("A null pointer is being accessed");
+				throw std::runtime_error("A null pointer is being accessed to get data");
 			}
 			
 			int left_index = cur->left_index;

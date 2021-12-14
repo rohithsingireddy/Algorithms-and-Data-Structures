@@ -5,7 +5,7 @@
 namespace String_Algorithms
 {
     /*
-     * Pattern matching in a text using Rabin-Karp. 
+     * Pattern matching in a text using Rabin-Karp Algorithm. 
      * Does not work for most inputs due to integer overflows
      * Same logic is implemented in python where it works
      * Takes a text, pattern strings, max. possible characters, and prime as input

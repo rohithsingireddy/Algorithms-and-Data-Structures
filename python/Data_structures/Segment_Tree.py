@@ -54,7 +54,7 @@ class Segment_Tree:
     def __range__(self, cur:Segment_Node, left:int, right:int):
         '''
             Returns the value after performing the given operation
-            between the elements in the range
+            between the elements in the range.
         '''
         if left > right:
             return self.placeholder
@@ -119,16 +119,4 @@ class Segment_Tree:
         self.__check_index__(index)
         self.__change_value__(self.root, index, new_data)
 
-
-if __name__ == "__main__":
-    def f(a:int, b:int):
-        return a if a > b else b
-    from math import inf
-    l = [int(x) for x in input().split()]
-    t = Segment_Tree(l, -inf, f)
-
-    print(t.range_operation(2, 3))
-    t.update(3, 100)
-    print(t.range_operation(0, 3))
-    
 

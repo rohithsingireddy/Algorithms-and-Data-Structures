@@ -1,7 +1,10 @@
 from math import inf
 
 def max_sub_array_sum(array:list):
-    
+    '''
+        Takes an array and returns the maximum possible sum of a sub-array and 
+        returns the sum and the indices of sub-array whose sum is that max sum
+    '''
     def conquer(left:int, mid:int, right:int) -> tuple:
         left_sum, right_sum = -inf, -inf
         max_left, max_right = mid, mid
@@ -42,7 +45,3 @@ def max_sub_array_sum(array:list):
     
     return divide(0, len(array) - 1)
 
-
-if __name__ == '__main__':
-    aray = [int(x) for x in input().split()]
-    print(max_sub_array_sum(aray))
