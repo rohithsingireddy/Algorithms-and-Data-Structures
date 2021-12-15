@@ -59,7 +59,7 @@ def quick_sort(array:list):
             stack.append((partition_index + 1, end))
 
 
-def count_sort(array:list, max_value:int):
+def count_sort(array:list, max_value:int, be_stable:bool = True):
     '''
         Takes array and maximum value of list as input and uses count sort to sort the list
         Count sort can only be used when the values to be sorted are non-negative integers and the 
@@ -76,9 +76,15 @@ def count_sort(array:list, max_value:int):
         counting_array[i] += counting_array[i-1]
     
     sorted_array = [0 for _ in range(size)]
-    for i in reversed(array):
-        counting_array[i] -= 1
-        sorted_array[counting_array[i]] = i
+
+    if be_stable:
+        for i in reversed(array):
+            counting_array[i] -= 1
+            sorted_array[counting_array[i]] = i
+    else:
+        for i in array:
+            counting_array[i] -= 1
+            sorted_array[counting_array[i]] = i
     
     for i in range(size):
         array[i] = sorted_array[i]

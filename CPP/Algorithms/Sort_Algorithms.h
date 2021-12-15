@@ -1,13 +1,13 @@
 #include <stack>
 #include <cstring>
-#include <iostream>
+// #include <iostream>
 
 namespace Sort
 {
 	/*
-	* Takes two elements of same type and swaps their values
-	* Returns null
-	*/
+	 * Takes two elements of same type and swaps their values
+	 * Returns null
+	 */
 	template <typename T>
 	void swap(T &a, T &b)
 	{
@@ -77,9 +77,9 @@ namespace Sort
 
 			T pivot = array[range.second];
 
-			//Partition procedure begin
+			// Partition procedure begin
 
-			//Index before which elements are less than	pivot (inclusive)
+			// Index before which elements are less than	pivot (inclusive)
 			int i = range.first - 1;
 
 			for (int j = range.first; j < range.second; ++j)
@@ -93,7 +93,7 @@ namespace Sort
 			}
 			int partition_index = i + 1;
 			swap(array[partition_index], array[range.second]);
-			//Partition procedure end
+			// Partition procedure end
 
 			if (range.first < partition_index - 1)
 			{
@@ -107,17 +107,15 @@ namespace Sort
 	}
 
 	/*
-	 * Takes array, size and maximum value in array as input
+	 * Takes a vector array, size and maximum value in array as input
 	 * Sorts the array using count sort
 	 * Only used on non-negaitve integers
 	 */
 	template <typename T = unsigned long long>
-	void count_sort(T *array, int size, T max_value_of_element)
+	void count_sort(std::vector<T> &array, int max_value_of_element, bool be_stable = true)
 	{
-		int *count_of_element;
-		count_of_element = new int[max_value_of_element + 1];
-
-		memset(count_of_element, 0, sizeof count_of_element);
+		int size = array.size();
+		std::vector<int> count_of_element(max_value_of_element + 1, 0);
 
 		for (int i = 0; i < size; i++)
 		{
@@ -129,16 +127,22 @@ namespace Sort
 			count_of_element[i] += count_of_element[i - 1];
 		}
 
-		T *sorted_array = new T[size];
-		for (int i = size - 1; i >= 0; --i)
+		std::vector<T> sorted_array(size);
+		if (be_stable)
 		{
-			sorted_array[--count_of_element[array[i]]] = array[i];
+			for (int i = size - 1; i >= 0; --i)
+			{
+				sorted_array[--count_of_element[array[i]]] = array[i];
+			}
 		}
-
-		for (int i = 0; i < size; i++)
+		else
 		{
-			array[i] = sorted_array[i];
+			for (int i = 0; i < size; ++i)
+			{
+				sorted_array[--count_of_element[array[i]]] = array[i];
+			}
 		}
+		array = sorted_array;
 	}
 
 	/*
