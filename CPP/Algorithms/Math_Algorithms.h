@@ -172,10 +172,10 @@ namespace Math_Algorithms
         while (power > 0)
         {
 
-            if (power & 1 == 1)
+            if ((power & 1) == 1)
             {
                 c += i;
-                result *= running_product; // Overflow may occur here 
+                result *= running_product; // Overflow may occur here
                 result %= base;
             }
             i *= 2;

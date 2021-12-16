@@ -5,7 +5,6 @@
 #include <stdexcept>
 namespace Data_Structures
 {
-	// TODO: Implement inorder, preorder and postorder traversals iteratively
 	template <typename T1, typename T2>
 	class Binary_Tree
 	{

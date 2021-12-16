@@ -117,14 +117,14 @@ namespace String_Algorithms
 
     /*
      * Suffix array
-     * Takes a string and maximum value of single character as input
+     * Takes a string, maximum value of single character and sentinel as input
      * Returns a vector containing the suffix array
      * Works for tested inputs
      * For more info, see https://cp-algorithms.com/string/suffix-array.html
      */
-    std::vector<int> get_suffix_array(std::string s, int max_char = 256)
+    std::vector<int> get_suffix_array(std::string s, int max_char = 256, std::string sentinel = "$")
     {
-        s += "$";
+        s += sentinel;
         int size = s.size();
 
         std::vector<int> suffix_array(size - 1), class_array(size);
@@ -253,6 +253,69 @@ namespace String_Algorithms
 
         return lcp;
         
+    }
+
+    /*
+     * Z-Algorithm
+     * Takes a string, pattern and sentinel as input
+     * Returns the indices where the pattern exists in the string
+     */
+    std::vector<int> z_matcher(std::string str, std::string pattern, std::string sentinel = "$")
+    {
+        int pattern_size = pattern.size();
+        str = pattern + sentinel + str;
+        int size  = str.size();
+        std::vector<int> z_lengths(size), indices;
+
+        z_lengths[0] = size;
+
+        // For z-box
+        int left = -1, right = -1; 
+        for( int i = 1; i < size; i++ )
+        {
+            if( i > right )
+            {
+                int length = 0;
+                while( i + length < size && str[length] == str[i + length])
+                {
+                    length++;
+                }
+                z_lengths[i] = length;
+
+                left = i;
+                right = i + length - 1;
+            }
+            else
+            {
+                // Right to i in z-box
+                int remaining = right - i + 1;
+
+                // Index in prefix where char at i is in one-to-one relationship
+                // Or i - left
+                int index_in_prefix = pattern_size - remaining;
+
+                z_lengths[i] = z_lengths[index_in_prefix];
+
+                if( z_lengths[i] >= remaining )
+                {
+                    int length = 0, 
+                        j = right + 1, 
+                        k = index_in_prefix + z_lengths[i];
+                    while( j + length < size && str[j + length] == str[k + length])
+                    {
+                        length++;
+                    }
+                    z_lengths[i] += length;
+
+                    left = i, right = i + z_lengths[i] - 1;
+                }
+            }
+            if( z_lengths[i] == pattern_size )
+            {
+                indices.push_back(i - pattern_size - 1);
+            }
+        }
+        return indices;
     }
 
 }

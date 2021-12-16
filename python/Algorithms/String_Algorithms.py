@@ -184,4 +184,57 @@ def get_lcp_array(s:str, suffix_array:list) -> list:
     return lcp
 
 
+def z_matcher(string:str, pattern:str, sentinel:str = "#") -> list:
+    '''
+        Z-Algorithm
+        Takes a string, pattern and sentinel as input
+        Returns the indices where the pattern exists in the string
+    '''
+    pattern_size = len(pattern)
+    string = pattern + sentinel + string
+    size = len(string)
 
+    z_lengths = [0 for _ in range(size)]
+    indices = list()
+    left, right = -1, -1
+
+    z_lengths[0] = size
+    for i in range(1, size):
+        if i > right:
+            length = 0
+            
+            while i + length < size and string[length] == string[i + length]:
+                length += 1
+            
+            z_lengths[i] = length
+            left, right = i, i + length - 1
+
+        else:
+            # Right to i in z-box
+            remaining = right - i + 1
+            # Index in prefix where char at i is in one-to-one relationship with prefix
+            index_in_prefix = i - left
+
+            z_lengths[i] = z_lengths[index_in_prefix]
+
+            if z_lengths[i] >= remaining:
+                length, j, k = 0, right + 1, index_in_prefix + z_lenghts[i]
+                
+                while j + length < size and string[j + length] == string[k + length]:
+                    length += 1
+
+                z_lengths[i] += length
+
+                left, right = i, i + z_lenghts[i] - 1
+        
+            if z_lengths[i] == pattern_size:
+                indices.append(i - pattern_size - 1)
+    return indices
+
+
+
+if __name__ == '__main__':
+    s = input()
+    p = input()
+    for i in z_matcher(s, p):
+        assert(s[i:i + len(p)] == p)

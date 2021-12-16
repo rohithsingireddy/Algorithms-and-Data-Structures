@@ -1,5 +1,6 @@
 #include <stack>
 #include <cstring>
+#include <vector>
 // #include <iostream>
 
 namespace Sort

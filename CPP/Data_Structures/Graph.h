@@ -582,6 +582,10 @@ public:
      */
     bool bellman_ford_path_weights(int source_index)
     {
+        if( this->is_directed )
+        {
+            throw std::runtime_error("Does not work with directed graphs");
+        }
         nodes[source_index].distance_from_source = 0;
         std::vector<Edge> temp_edges = this->get_edges();
 
@@ -624,6 +628,10 @@ public:
      */
     void djikstra_shortest_path(int source_index)
     {
+        if( this->is_directed )
+        {
+            throw std::runtime_error("Does not work with directed graphs");
+        }
         Fibonnaci_Heap<int, Node *> fb_min_heap;
         for (int i = 0; i < this->no_of_nodes; i++)
         {
@@ -643,7 +651,7 @@ public:
             std::pair<int, Node *> min_node = fb_min_heap.extract_min();
             int key = min_node.first;
             Node *current = min_node.second;
-            int src_dist = current->distance_from_source; // Segment Fault happens here
+            int src_dist = current->distance_from_source;
 
             for (Node *adj : current->adjacent_nodes)
             {

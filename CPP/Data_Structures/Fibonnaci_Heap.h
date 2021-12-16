@@ -10,8 +10,7 @@
 #include <unordered_set>
 #include "LinkedList.h"
 
-/*
- * Segmentation fault when used in some programs with pointers as data
+/**
  * Not an exact implementation. Some liberties were taken
  * Has a large memory footprint
  * Can be made more robust.
@@ -26,8 +25,6 @@ private:
 	struct node
 	{
 		node *parent = nullptr;
-		node *left = nullptr;
-		node *right = nullptr;
 		std::unordered_set<node *> children;
 		int degree = 0;
 		bool mark = false;
@@ -63,7 +60,7 @@ private:
 		return this->root_list;
 	}
 
-	/*
+	/**
 	 * Helper function to connect two nodes of same degree
 	 * and create a parent child relationship between them
 	 * based on their keys.
@@ -77,7 +74,7 @@ private:
 		child->mark = false;
 	}
 
-	/*
+	/**
 	 * Helper function to take a child of node in heap and
 	 * add it to root list in case it has lower key than
 	 * the parent
@@ -91,7 +88,7 @@ private:
 		child->mark = false;
 	}
 
-	/*
+	/**
 	 * Helper function to recursively implement the cut
 	 * until the min heap property is maintained
 	 */
@@ -112,20 +109,20 @@ private:
 		}
 	}
 
-	/*
-	 * Helper function to maintain the heap rule 
+	/**
+	 * Helper function to maintain the heap rule
 	 * in the tree after extracting min node
 	 */
 	void consolidate()
 	{
-		std::unordered_map<int, node*> degree_dict;
+		std::unordered_map<int, node *> degree_dict;
 		this->root_list->begin_iteration();
 		while (!this->root_list->has_reached_end())
 		{
 			node *current = this->root_list->next();
 			int current_degree = current->degree;
 
-			if( degree_dict.find(current_degree) != degree_dict.end() )
+			if (degree_dict.find(current_degree) != degree_dict.end())
 			{
 				degree_dict.insert({current_degree, nullptr});
 			}
@@ -140,11 +137,11 @@ private:
 				this->link(another_node, current);
 				degree_dict[current_degree] = nullptr;
 				current_degree++;
-	
-				if( degree_dict.find(current_degree) != degree_dict.end() )
+
+				if (degree_dict.find(current_degree) != degree_dict.end())
 				{
 					degree_dict.insert({current_degree, nullptr});
-				}				
+				}
 			}
 			degree_dict[current_degree] = current;
 		}
@@ -172,12 +169,12 @@ private:
 		}
 	}
 
-	/*
+	/**
 	 * For pseudo bound checking
 	 */
 	inline void check_index(int index)
 	{
-		if( index >= this->index )
+		if (index >= this->index)
 		{
 
 			throw std::invalid_argument("Node with index is not in the heap\n");
@@ -193,7 +190,15 @@ public:
 		this->index = 0;
 	}
 
-	/*
+	~Fibonnaci_Heap()
+	{
+		for (auto i : this->node_dict)
+		{
+			delete i.second;
+		}
+	}
+
+	/**
 	 * Takes data as input
 	 * Stores it into the fibonacci heap
 	 * Returns a number that serves as a representative
@@ -211,11 +216,11 @@ public:
 
 		root_list->insert(created_node);
 		this->no_of_nodes++;
-		node_dict.insert({this->index++, created_node});
+		this->node_dict.insert({this->index++, created_node});
 		return this->index - 1;
 	}
 
-	/*
+	/**
 	 * Connects the argument heap with the calling heap
 	 * It would not be possible to decrease or delete nodes of
 	 * argument heap after calling this funciton for now.
@@ -231,8 +236,8 @@ public:
 		this->no_of_nodes += h1.no_of_nodes;
 	}
 
-	/*
-	 * Returns the key and data of the node with the 
+	/**
+	 * Returns the key and data of the node with the
 	 * minimum key in the heap and removes it from the heap
 	 */
 	std::pair<T1, T2> extract_min()
@@ -251,23 +256,17 @@ public:
 			}
 			this->root_list->remove(top);
 
-			if (top == top->right)
-			{
-				this->min = nullptr;
-			}
-			else
-			{
-				this->min = top->right;
-				this->consolidate();
-			}
+			this->consolidate();
+
 			data = std::make_pair(top->key, top->data);
+			// delete top // Segementation fault because of this
 		}
 		this->no_of_nodes--;
 		return data;
 	}
 
-	/*
-	 * Takes the index of the node to decrease and the 
+	/**
+	 * Takes the index of the node to decrease and the
 	 * new value to decrease the key.
 	 * Throws an exception if the new key is greater than current key
 	 */
@@ -295,7 +294,7 @@ public:
 		}
 	}
 
-	/*
+	/**
 	 * Deletes a given index'th node from the tree
 	 * Takes a index of node to be deleted and lowest possible
 	 * value for the key type
@@ -306,7 +305,7 @@ public:
 		this->extract_min();
 	}
 
-	/*
+	/**
 	 * Returns true if the heap is empty
 	 */
 	bool is_empty()
