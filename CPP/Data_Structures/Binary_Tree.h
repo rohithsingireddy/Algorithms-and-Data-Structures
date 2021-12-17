@@ -28,7 +28,7 @@ namespace Data_Structures
 
 		binary_node *root;
 
-		/*
+		/**
 		 * Takes two subtrees and replaces one with other sub tree
 		 */
 		void transplant(binary_node *replaced, binary_node *replacement)
@@ -47,7 +47,7 @@ namespace Data_Structures
 				replacement->parent = parent;
 		}
 
-		/* 
+		/** 
 		 * Removes the given node from the sub-tree and readjusts the tree
 	 	 */
 		void remove(binary_node *node)
@@ -80,7 +80,7 @@ namespace Data_Structures
 			delete node;
 		}
 
-		/* 
+		/** 
 		 * Finds the leftmost ( also know as lowest node) node of the subtree
 	 	 * Returns a pointer to that node
 	 	 */
@@ -96,7 +96,7 @@ namespace Data_Structures
 			return temp;
 		}
 
-		/*
+		/**
 	 	 * Finds the rightmost( also known as greatest node )node of the subtree
 	 	 * Returns a pointer to that node
 	 	 */
@@ -112,7 +112,7 @@ namespace Data_Structures
 			return temp;
 		}
 
-		/*
+		/**
 	 	 * Takes a given node and gives the smallest node which is greater than its
 	 	 * Returns null if no node that satisifes the above exists
 	 	 */
@@ -131,7 +131,7 @@ namespace Data_Structures
 			return parent;
 		}
 
-		/*
+		/**
 	 	 * Takes a given node and gives the largest node which is smaller than its key
 	 	 * Returns null if no node that satisfies the above exists
 	 	 */
@@ -150,7 +150,7 @@ namespace Data_Structures
 			return parent;
 		}
 
-		/*
+		/**
 	 	 * Searches for a node with the given value
 		 * Returns a binary_node pointer if node exists else null
 		 */
@@ -177,10 +177,10 @@ namespace Data_Structures
 
 		~Binary_Tree()
 		{
-			std::function<void(binary_node*)> delete_node = 
-			[&delete_node, this](binary_node* current) -> void
+			std::function<void(binary_node *)> delete_node =
+				[&delete_node, this](binary_node *current) -> void
 			{
-				if( current != nullptr )
+				if (current != nullptr)
 				{
 					delete_node(current->left);
 					delete_node(current->right);
@@ -191,7 +191,7 @@ namespace Data_Structures
 			delete_node(this->root);
 		}
 
-		/*
+		/**
 		 * Takes a value and inserts into the binary tree
 		 * Returns null
 		 */
@@ -218,7 +218,7 @@ namespace Data_Structures
 				trailing_temp->right = node;
 		}
 
-		/*
+		/**
 		 * Removes a node with a given value if it exists
 		 * Ohterwise does nothing
 		 */
@@ -227,7 +227,7 @@ namespace Data_Structures
 			remove(this->search_tree(key));
 		}
 
-		/*
+		/**
 		 * Search for a key in the tree
 		 * Returns key and data as a pair if key is present 
 		 * Throws an exception if key is not in tree
@@ -245,7 +245,7 @@ namespace Data_Structures
 			}
 		}
 
-		/*
+		/**
 		 * Returns the data of the lower bound of the given key provided
 		 * that the key is present in the tree.
 		 * If lower bound does not exist, it returns itself
@@ -262,7 +262,7 @@ namespace Data_Structures
 			return std::make_pair(lb_node->key, lb_node->data);
 		}
 
-		/*
+		/**
 		 * Returns the data of the upper bound of the given key provided
 		 * that the key is present in the tree
 		 * If lower bound does not exist, it returns itself

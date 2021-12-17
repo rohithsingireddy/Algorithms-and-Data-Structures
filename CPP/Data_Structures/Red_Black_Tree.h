@@ -2,18 +2,24 @@
 #include <stdio.h>
 #include <vector>
 #include <functional>
+#include <stdexcept>
 
 template <typename T1, typename T2>
 class Red_Black_Tree
 {
 private:
+    /**
+     * Represents a node color
+     */ 
     enum Node_Color
     {
         RED,
         BLACK
     };
 
-    // Node in the tree
+    /**
+     * Represents a node in the tree
+     */ 
     struct Node
     {
         T1 key;
@@ -303,6 +309,8 @@ private:
         {
             this->rb_delete_fixup(next_node);
         }
+
+        delete del_node;
     }
 
     /**
@@ -382,28 +390,71 @@ private:
         current->color = BLACK;
     }
 
+    /**
+     * Searches for a node in the given tree
+     * Returns NIL pointer if key does not exist
+     */
     Node *rb_search(T1 key)
     {
         Node *current = this->root;
         while (current != this->NIL)
         {
-            if (key < current->key)
+            if (key == current->key)
+            {
+                return current;
+            }
+            else if (key < current->key)
             {
                 current = current->left_child;
             }
-            else if (key > current->key)
-            {
-                current = current->right_child;
-            }
             else
             {
-                return current;
+                current = current->right_child;
             }
         }
         return this->NIL;
     }
 
+    /**
+     * Returns a node that is the greatest value less than the given node's key
+     */
+    Node *predecessor_of(Node *current)
+    {
+        if (current->left_child != this->NIL)
+        {
+            return this->max_in_tree(current->left_child);
+        }
+        Node *current_parent = current->parent;
+        while (current_parent != this->NIL && current_parent->left_child == current)
+        {
+            current = current_parent;
+            current_parent = current->parent;
+        }
+        return current_parent;
+    }
+
+    /**
+     * Returns a node that is the least value greater than the given node's key
+     */
+    Node *successor_of(Node *current)
+    {
+        if (current->right_child != this->NIL)
+        {
+            return this->min_in_tree(current->right_child);
+        }
+        Node *current_parent = current->parent;
+        while (current_parent != this->NIL && current_parent->right_child == current)
+        {
+            current = current_parent;
+            current_parent = current->parent;
+        }
+        return current_parent;
+    }
+
 public:
+    /**
+     * Default Constructor
+     */ 
     Red_Black_Tree()
     {
         this->NIL = new Node(T1(), T2());
@@ -413,6 +464,28 @@ public:
         this->root = this->NIL;
     }
 
+    /**
+     * Copy constructor
+     */ 
+    Red_Black_Tree(const Red_Black_Tree &other)
+    {
+        this->NIL = new Node(T1(), T2());
+        this->NIL = new Node(T1(), T2());
+        this->NIL->left_child = this->NIL;
+        this->NIL->right_child = this->NIL;
+        this->NIL->parent = this->NIL;
+        this->NIL->color = BLACK;
+        this->root = this->NIL;        
+
+        for( auto i: other.preorder_traversal() )
+        {
+            this->insert(i.first, i.second);
+        }
+    }
+
+    /**
+     * Destructor
+     */ 
     ~Red_Black_Tree()
     {
         std::function<void(Node *)> delete_node =
@@ -449,6 +522,20 @@ public:
         {
             this->rb_delete(cur);
         }
+    }
+
+    /**
+     * Returns data associated with key along with key if key is present
+     * else throws an exception
+     */
+    std::pair<T1, T2> search(T1 key)
+    {
+        Node *searched_node = this->rb_search(key);
+        if (searched_node == this->NIL)
+        {
+            throw std::invalid_argument("Key is not in tree\n");
+        }
+        return std::make_pair(searched_node->key, searched_node->data);
     }
 
     /**
@@ -547,5 +634,73 @@ public:
             }
         }
         return result;
+    }
+
+    /**
+     * Getting the lower bound or predecessor of a key
+     */
+    std::pair<T1, T2> get_predecessor(T1 key)
+    {
+        Node *searched_node = this->rb_search(key);
+        Node *inserted_node = this->NIL;
+        if (searched_node == this->NIL)
+        {
+            inserted_node = new Node(key, T2());
+            this->rb_insert(inserted_node);
+            searched_node = inserted_node;
+        }
+        Node *pred_node = this->predecessor_of(searched_node);
+        std::pair<T1, T2> result = std::make_pair(pred_node->key, pred_node->data);
+
+        if (inserted_node != this->NIL)
+        {
+            this->rb_delete(inserted_node);
+        }
+
+        return result;
+    }
+
+    /**
+     * Getting upper bound or successor of a given key
+     */
+    std::pair<T1, T2> get_successor(T1 key)
+    {
+        Node *searched_node = this->rb_search(key);
+        Node *inserted_node = this->NIL;
+        if (searched_node == this->NIL)
+        {
+            inserted_node = new Node(key, T2());
+            this->rb_insert(inserted_node);
+            searched_node = inserted_node;
+        }
+
+        Node *succ_node = this->successor_of(searched_node);
+
+        std::pair<T1, T2> result = std::make_pair(succ_node->key, succ_node->data);
+
+        if (inserted_node != this->NIL)
+        {
+            this->rb_delete(inserted_node);
+        }
+
+        return result;
+    }
+
+    /**
+     * Returns true if element exists in tree
+     * Else false
+     */
+    bool contains(T1 key)
+    {
+        return this->NIL != this->rb_search(key);
+    }
+
+    /**
+     * Overloading = operator
+     */
+    void operator=(const Red_Black_Tree &other)
+    {
+        this->NIL = other.NIL;
+        this->root = other.root;
     }
 };
