@@ -1,10 +1,10 @@
 # Algorithms and Data-Structures
-
+<!-- Add Urls to algorithms and book page references -->
 Some algorithms I implemmented while studying, well, algorithms.
 
 The cpp implementations might leave some dangling pointers in some programs.
 
-Most of the algorithms are implemented by following the pseudo code present in the book `Introduction to Algorithms` by **CLRS** and from [CP-algorithms][cp-site].
+Most of the algorithms are implemented by following the pseudo code present in the book `Introduction to Algorithms` by **CLRS** and from `[CP-algorithms][cp-site]` with occasional help from `[Stack Overflow][stack-overflow]`.
 
 Algorithms are tested for small to medium random inputs so edge cases might not have been handled well.
 
@@ -27,7 +27,7 @@ The following algorithms are implemented in both `CPP`[^1] and `Python`[^2].
     - Factorization of a number
     - Prime numbers using Erasthonesis
     - Greatest Common Divisor (GCD) along with the given number's multiplicate inverses modulo other number
-    - Chinese Remainder Theorem (CRT) for solving equations of type a == (r[i]) mod n[i] ∀ i < N
+    - Chinese Remainder Theorem (CRT) for solving equations of type a == (r[i] mod n[i]) ∀ i < N
     - Binary Exponentiation modulo number
 
 - Miscellaneous
@@ -118,7 +118,7 @@ The following are some algorithms I want to implement in the future.
 
 
 [max-sub-array-sum]: https://en.wikipedia.org/wiki/Maximum_subarray_problem
-
+[stack-overflow]: https://stackoverflow.com/
 [cp-site]: https://cp-algorithms.com
 
 [^1]: The cpp programs were compiled and tested with g++ 11.1.0 version
