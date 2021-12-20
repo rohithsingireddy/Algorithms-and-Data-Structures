@@ -2,6 +2,9 @@
 #include <string>
 #include <stdio.h>
 
+/*
+ * Not yet completed
+ */
 class Suffix_Tree
 {
 private:
