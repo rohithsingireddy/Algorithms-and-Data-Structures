@@ -3,7 +3,8 @@
 #include <stdio.h>
 
 /*
- * Not yet completed
+ * Only tested for small inputs like abcabxabcd
+ * Implemmented by following explanation at https://stackoverflow.com/a/9513423 used under CC BY-SA 4.0
  */
 class Suffix_Tree
 {
@@ -15,14 +16,16 @@ private:
         int start, end, length;
         std::unordered_map<char, Node *> edges;
         Node *suffix_link, *parent;
+        bool is_leaf;
 
-        explicit Node(Node *parent, int start = -1, int end = -1)
+        explicit Node(Node *parent, int start = -10, int end = -10)
         {
             this->start = start;
             this->end = end;
             this->length = end - start;
             this->suffix_link = nullptr;
             this->parent = parent;
+            this->is_leaf = true;
         }
 
         void update_indices(int start, int end)
@@ -52,14 +55,16 @@ private:
     {
         Node *new_node = new Node(current, start, end);
 
+        new_node->suffix_link = this->root;
+
         current->edges.insert({this->text[start], new_node});
+        current->is_leaf = false;
     }
 
     Node *split_node(Node *cur, Node *prev_split = nullptr)
     {
         Node *new_node = new Node(cur->parent, cur->start, cur->start + this->active.length);
-        // printf("%d ----- %d\n", cur->start, cur->end);
-
+        
         cur->parent->edges[this->text[cur->start]] = new_node;
 
         cur->update_indices(new_node->end, cur->end);
@@ -68,6 +73,7 @@ private:
 
         new_node->suffix_link = cur->suffix_link;
         cur->suffix_link = nullptr;
+        new_node->is_leaf = false;
 
         if (prev_split != nullptr)
         {
@@ -87,6 +93,10 @@ private:
                 return cur->edges.find(this->text[index]) != cur->edges.end();
             }
             int char_index = cur->start + this->active.length;
+            if (char_index == cur->end)
+            {
+                return cur->edges.find(this->text[index]) != cur->edges.end();
+            }
             return this->text[char_index] == this->text[index];
         }
         return false;
@@ -98,7 +108,7 @@ private:
         if (this->is_in_active_edge(index))
         {
             Node *cur = this->active.node->edges[this->active.edge];
-            if (this->active.length + 1 >= cur->length)
+            if (this->active.length + 1 > cur->length)
             {
                 this->active.set(
                     cur,
@@ -112,11 +122,9 @@ private:
                     this->active.edge,
                     this->active.length + 1);
             }
-            this->remainder++;
         }
         else
         {
-            // printf("\\\\\\\\ %d %c \\\\\\\\\\\n", index, this->active.edge);
             Node *last_split_node = nullptr;
             int prev_index = index - this->remainder + 1;
             while (this->remainder > 0)
@@ -131,9 +139,10 @@ private:
                 {
                     temp = this->active.node;
                 }
-                if (this->active.length > 0)
+                if (this->can_split(temp))
                 {
                     temp = this->split_node(temp, last_split_node);
+                    last_split_node = temp;
                     if (this->active.node == this->root)
                     {
                         this->active.set(
@@ -144,37 +153,36 @@ private:
                     else
                     {
                         this->active.set(
-                            (this->active.node->suffix_link == nullptr)
-                                ? this->root
-                                : this->active.node->suffix_link,
+                            this->active.node->suffix_link,
                             this->active.edge,
                             this->active.length);
                     }
-                    last_split_node = temp;
                 }
-                else
-                {
-                        this->active.set(
-                            this->NIL,
-                            '\0',
-                            0);
-                }
-                // printf("******** %c ********\n", this->active.edge);
                 this->insert_node(temp, index, this->size);
                 this->remainder--;
                 if (this->is_in_active_edge(index))
                 {
+                    this->active.set(
+                        this->NIL,
+                        '\0',
+                        this->active.length + 1);
                     break;
                 }
             }
         }
     }
 
+    bool can_split(Node *cur)
+    {
+        //Might not be the correct condition
+        return cur->start + this->active.length < cur->end;
+    }
+
     void create_suffix_tree()
     {
         for (int i = 0; i < this->size; i++)
         {
-            this->remainder = (this->remainder <= 0) ? 1 : this->remainder;
+            this->remainder = (this->remainder <= 0) ? 1 : this->remainder + 1;
             this->insert(i);
         }
     }
@@ -187,9 +195,11 @@ public:
         this->size = this->text.size();
         this->remainder = 0;
 
-        this->NIL = new Node(nullptr, -1, -1);
+        this->NIL = new Node(nullptr);
         this->root = new Node(this->NIL);
+        this->NIL->is_leaf = false;
 
+        this->root->suffix_link = this->NIL;
         for (int i = 0; i < 256; i++)
         {
             NIL->edges.insert({(char)i, this->root});
@@ -214,7 +224,7 @@ public:
 
         if (current != this->root)
         {
-            append = this->text.substr(current->start, current->end - current->start);
+            append = this->text.substr(current->start, current->length);
         }
 
         for (int i = 1; i < 256; i++)
@@ -226,7 +236,6 @@ public:
             }
         }
 
-        // printf("%d %d\n", current->start, current->end);
         if (!flag)
         {
             for (char c : s + append)
