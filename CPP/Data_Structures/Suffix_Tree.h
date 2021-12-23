@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <stdio.h>
+#include <stdexcept>
 
 /**
  * Only tested for small inputs like abcabxabcd
@@ -92,7 +93,7 @@ private:
         cur->parent = new_node;
 
         new_node->suffix_link = cur->suffix_link;
-        cur->suffix_link = nullptr;
+        cur->suffix_link = this->root;
         new_node->is_leaf = false;
 
         if (prev_split != nullptr)
@@ -120,6 +121,12 @@ private:
             {
                 Node *temp = cur->edges.find(this->active.edge)->second;
                 int char_index = temp->start + this->active.length;
+
+                if( char_index > temp->end )
+                {
+                    throw std::runtime_error("Invalid edge is being used for given character");
+                }
+
                 if (char_index == temp->end)
                 {
                     return temp->edges.find(this->text[index]) != temp->edges.end();
@@ -147,12 +154,16 @@ private:
             if (this->is_in_active_edge(index))
             {
                 Node *cur = this->active.node->edges[this->active.edge];
-                if (this->active.length + 1 > cur->length)
+                if (this->active.length + 1 == cur->length)
                 {
                     this->active.set(
                         cur,
-                        this->text[index],
+                        this->text[index], //???
                         1);
+                }
+                else if( this->active.length > cur->length)
+                {
+                    // TODO: Handle node transitions. Also includes the above case
                 }
                 else
                 {
@@ -277,7 +288,7 @@ public:
         this->size = this->text.size();
         this->remainder = 0;
 
-        this->root = new Node(nullptr);
+        this->root = new Node(this->root);
 
         this->root->suffix_link = this->root;
         this->active = Active();
@@ -310,7 +321,7 @@ public:
     /**
      * Returns a vector of all suffixes in sorted order
      */
-    std::vector<std::string> DFS()
+    std::vector<std::string> get_suffix_strings()
     {
         std::vector<std::string> result;
         this->dfs(this->root, "", result);
