@@ -1,7 +1,6 @@
 #include <stack>
 #include <cstring>
 #include <vector>
-// #include <iostream>
 
 namespace Sort
 {
@@ -17,6 +16,26 @@ namespace Sort
 		b = hold;
 	}
 
+	/**
+	 * Implements Bubble Sort
+	 * Takes a vector array of comparable elements as a reference input and sorts them using Bubble sort
+	 */
+	template <typename T>
+	void bubble_sort(std::vector<T> &array) 
+	{
+		int size = array.size();
+		for( int i = size - 1; i > 0; i-- )
+		{
+			for( int j = 0; j < i; j++ )
+			{
+				if( array[j] > array[j + 1])
+				{
+					swap<int>(array[j], array[j + 1]);
+				}
+			}
+		}
+	}
+
 	/*
 	 * Takes array and its size as input
 	 * Uses quick sort to sort the array
@@ -29,7 +48,7 @@ namespace Sort
 		{
 			T current = array[i];
 			int j = i - 1;
-			for (j; j >= 0 && array[j] > current; j--)
+			for (; j >= 0 && array[j] > current; j--)
 			{
 				array[j + 1] = array[j];
 			}
@@ -151,7 +170,7 @@ namespace Sort
 	 * Sorts the array using radix sort
 	 * Returns null
 	 */
-	void radix_sort(unsigned long long *array, unsigned int size, int max_digits = 20)
+	void radix_sort(unsigned long long *array, int size, int max_digits = 20)
 	{
 
 		const unsigned long long DIVISOR = 10;
@@ -159,8 +178,6 @@ namespace Sort
 		{
 			int digit;
 			unsigned long long value, actual_value;
-
-			number() : value(0), actual_value(0) {}
 		};
 		number *number_array = new number[size];
 		for (int i = 0; i < size; i++)
