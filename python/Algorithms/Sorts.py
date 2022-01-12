@@ -1,5 +1,16 @@
 
 
+def bubble_sort(array:list) -> None:
+    '''
+        Takes a list as input and uses bubble sort to sort the list
+    '''
+    size = len(array)
+    for i in range(size - 1, 0, -1):
+        for j in range(0, i):
+            if array[j] > array[j + 1]:
+                array[j], array[j + 1] = array[j + 1], array[j]
+
+
 def insertion_sort(array:list):
     '''
         Takes a list as input and uses insertion sort to sort the list
@@ -171,3 +182,7 @@ def merge_sort(array:list):
                 current_index += 1
         
 
+if __name__ == "__main__":
+    a = [int(x) for x in input().split()]
+    bubble_sort(a)
+    print(a)
