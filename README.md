@@ -4,7 +4,7 @@ Some algorithms I implemmented while studying, well, algorithms.
 
 The cpp implementations might leave some dangling pointers in some programs.
 
-Most of the algorithms are implemented by following the pseudo code present in the book `Introduction to Algorithms` by **CLRS** and from `[CP-algorithms](https://cp-algorithms.com)` with occasional help from `[Stack Overflow](https://stackoverflow.com/)`.
+Most of the algorithms are implemented by following the pseudo code present in the book `Introduction to Algorithms` by **CLRS** and from `CP-algorithms` with occasional help from `Stack Overflow`.
 
 Algorithms are tested for small to medium random inputs so edge cases might not have been handled well.
 
