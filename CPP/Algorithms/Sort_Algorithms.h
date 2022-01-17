@@ -4,7 +4,7 @@
 
 namespace Sort
 {
-	/*
+	/**
 	 * Takes two elements of same type and swaps their values
 	 * Returns null
 	 */
@@ -21,29 +21,30 @@ namespace Sort
 	 * Takes a vector array of comparable elements as a reference input and sorts them using Bubble sort
 	 */
 	template <typename T>
-	void bubble_sort(std::vector<T> &array) 
+	void bubble_sort(std::vector<T> &array)
 	{
 		int size = array.size();
-		for( int i = size - 1; i > 0; i-- )
+		for (int i = size - 1; i > 0; i--)
 		{
-			for( int j = 0; j < i; j++ )
+			for (int j = 0; j < i; j++)
 			{
-				if( array[j] > array[j + 1])
+				if (array[j] > array[j + 1])
 				{
-					swap<int>(array[j], array[j + 1]);
+					swap<T>(array[j], array[j + 1]);
 				}
 			}
 		}
 	}
 
-	/*
+	/**
 	 * Takes array and its size as input
 	 * Uses quick sort to sort the array
 	 * Returns null
 	 */
 	template <typename T>
-	void insertion_sort(T *array, int size)
+	void insertion_sort(std::vector<T> &array)
 	{
+		int size = array.size();
 		for (int i = 1; i < size; i++)
 		{
 			T current = array[i];
@@ -56,15 +57,15 @@ namespace Sort
 		}
 	}
 
-	/*
+	/**
 	 * Takes array and its size as input
 	 * Uses quick sort to sort the array
 	 * Returns null
 	 */
 	template <typename T>
-	void selection_sort(T *array, int size)
+	void selection_sort(std::vector<T> &array)
 	{
-
+		int size = array.size();
 		for (int i = 0; i < size - 1; i++)
 		{
 			int index_of_min = i;
@@ -79,14 +80,15 @@ namespace Sort
 		}
 	}
 
-	/*
+	/**
 	 * Takes array and its size as input
 	 * Uses quick sort to sort the array
 	 * Returns null
 	 */
 	template <typename T>
-	void quick_sort(T *array, int size)
+	void quick_sort(std::vector<T> &array)
 	{
+		int size = array.size();
 		std::stack<std::pair<int, int>> stack;
 		stack.push(std::pair<int, int>(0, size - 1));
 
@@ -126,7 +128,7 @@ namespace Sort
 		}
 	}
 
-	/*
+	/**
 	 * Takes a vector array, size and maximum value in array as input
 	 * Sorts the array using count sort
 	 * Only used on non-negaitve integers
@@ -165,21 +167,30 @@ namespace Sort
 		array = sorted_array;
 	}
 
-	/*
+	/**
 	 * Takes an non-negative integer array, size, maximum allowed digits in a number as input
 	 * Sorts the array using radix sort
 	 * Returns null
 	 */
-	void radix_sort(unsigned long long *array, int size, int max_digits = 20)
+	void radix_sort(std::vector<unsigned long long> &array, int max_digits = 20)
 	{
-
+		int size = array.size();
 		const unsigned long long DIVISOR = 10;
+		
+		// Helper datatype to make radix sorting easier to implement
 		struct number
 		{
 			int digit;
 			unsigned long long value, actual_value;
+
+			operator int() const 
+			{
+				return digit;
+			}
+
 		};
-		number *number_array = new number[size];
+
+		std::vector<number> number_array(size);
 		for (int i = 0; i < size; i++)
 		{
 			number_array[i].value = array[i];
@@ -190,31 +201,12 @@ namespace Sort
 		{
 			for (int i = 0; i < size; i++)
 			{
-				number_array[i].digit = number_array[i].value / DIVISOR;
+				number_array[i].digit = number_array[i].value % DIVISOR;
 				number_array[i].value /= DIVISOR;
 			}
-			unsigned long long count_array[10];
-			for (int i = 0; i < 10; i++)
-			{
-				count_array[i] = 0;
-			}
-			for (int i = 0; i < size; i++)
-			{
-				count_array[number_array[i].digit]++;
-			}
-			for (int i = 1; i < 10; i++)
-			{
-				count_array[i] += count_array[i - 1];
-			}
-			number *partially_sorted_array = new number[size];
-			for (int i = size - 1; i >= 0; i--)
-			{
-				partially_sorted_array[--count_array[number_array[i].digit]] = number_array[i];
-			}
-			for (int i = 0; i < size; i++)
-			{
-				number_array[i] = partially_sorted_array[i];
-			}
+			
+			// A stable sort
+			count_sort(number_array, 10);
 		}
 		for (int i = 0; i < size; i++)
 		{
@@ -222,11 +214,11 @@ namespace Sort
 		}
 	}
 
-	/*
+	/**
 	 * Used as a sub procdure in merge sort
 	 */
 	template <typename T>
-	void merge(T *array, int left, int right)
+	void merge(std::vector<T> &array, int left, int right)
 	{
 
 		int mid = (left + right) / 2;
@@ -271,17 +263,15 @@ namespace Sort
 		}
 	}
 
-	/*
+	/**
 	 * Takes array, starting index and ending index of the sub array to sort
 	 * Uses merge sort to sort the array
 	 */
 	template <typename T>
-	void merge_sort(T *array, int left, int right)
+	void merge_sort(std::vector<T> &array, int left, int right)
 	{
-
 		if (left < right)
 		{
-
 			int mid = (left + right) / 2;
 			merge_sort(array, left, mid);
 			merge_sort(array, mid + 1, right);
@@ -289,13 +279,14 @@ namespace Sort
 		}
 	}
 
-	/*
+	/**
 	 * Takes array and its size as input
 	 * Uses Merge sort to sort the array
 	 */
 	template <typename T>
-	void merge_sort(T *array, int size)
+	void merge_sort(std::vector<T> &array)
 	{
+		int size = array.size();
 		merge_sort(array, 0, size - 1);
 	}
 
