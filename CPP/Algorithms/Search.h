@@ -1,60 +1,65 @@
 #include <stack>
 #include <stdio.h>
+#include <vector>
 
 namespace Search {
 	
-	/* 
+	/** 
 	 * Takes a sorted array, its size and element to search as input and returns an integer as output
 	 * Returns lowest index in case of more than one occurrence of the searched element
 	 * If element is not in array, index of the first upper bound of element is returned
-	 * Return array size if no element and upper bound exist
+	 * Return -1 if no element and upper bound exist
 	 */
 	template<typename T>
-	int upper_bound( T* a, int size, T value_to_search) {
-		int low = 0, high = size, current = 0;
+	int upper_bound( const std::vector<T> &array, T value_to_search) {
+		int size = array.size();
+		int low = 0, high = size;
+		
 		while( low != high ) {
-			current = ( low + high - 1)/2;
-			
-			if( a[current] < value_to_search ) {
+			int current = ( low + high - 1)/2; // Ceil of a value
+			if( array[current] <= value_to_search ) {
 				low = current+1;
 			}
-
 			else {
 				high = current;
 			}
-
 		}
-		return low;
-	}
-
-
-	/* 
-	 * Takes a sorted array, its size and element to search as input and returns an integer as output
-	 * Returns highest index in case of more than one occurences of the searched element
-	 * If element is not in array, index of the last lower_bound of element is returned
-	 * Returns -1 if no element and its lower bound exist in the array
-	 */ 
-	template<typename T>
-	int lower_bound( T* a, int size, T value_to_search) {
-		int low = 0, high = size, current = 0;
-		while( low !=  high ) {
-			current = (low + high + 1)/2;
-
-			if( value_to_search < a[current] ) {
-				high = current - 1;
-			}
-			else {
-				low = current;
-			}
-		}
-		if( low == 0 && a[low] > value_to_search ) {
+		if( low == size )
+		{
 			return -1;
 		}
 		return low;
 	}
 
 
-	/*
+	/** 
+	 * Takes a sorted array, its size and element to search as input and returns an integer as output
+	 * Returns highest index in case of more than one occurences of the searched element
+	 * If element is not in array, index of the last lower_bound of element is returned
+	 * Returns -1 if no element and its lower bound exist in the array
+	 */ 
+	template<typename T>
+	int lower_bound( const std::vector<T> &array, T value_to_search) {
+		int size = array.size();
+		int low = 0, high = size;
+		while( low !=  high ) {
+			int current = (low + high + 1)/2; // Floor w.r.t division by 2
+
+			if( value_to_search < array[current] ) {
+				high = current - 1;
+			}
+			else {
+				low = current;
+			}
+		}
+		if( low == 0 && array[low] > value_to_search ) {
+			return -1;
+		}
+		return low;
+	}
+
+
+	/**
 	 * Takes a unsorted array with comparable elements, its size and nth element in a sorted list to find.
 	 * Returns the nth element 
 	 * If input array is 101,102,103 and 2nd element was to be found, 102 is returned.
@@ -63,8 +68,8 @@ namespace Search {
 	 * Should be tested
 	 */
 	template<typename T>
-	T nth_element_in( T* array, int size, T nth_element_to_find ) {
-
+	T nth_element_in( std::vector<T> &array, T nth_element_to_find ) {
+		int size = array.size();
 		if( nth_element_to_find <= 0 || nth_element_to_find > size ) {
 			return -1;
 		}
