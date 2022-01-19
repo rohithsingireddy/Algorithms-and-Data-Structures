@@ -8,34 +8,33 @@
 namespace Dynamic
 {
 
-	/*
-	* Takes array of prices of every length and the maximum length as input
-	* Assumes price array has price of every lenght including zero and max_length
-	* Returns a vector with maximum price that can be obtained at zero index and the possible
-	* lengths associated with that price in the following indices
-	*/
-	std::vector<int> max_price_for_rod(int *price_of_length, int max_length)
+	/**
+	 * Takes array of prices of every length and the maximum length as input
+	 * Returns a vector with maximum price that can be obtained at zero index and the possible
+	 * lengths associated with that price in the following indices
+	 * 
+	 * Based on the following recursive function		
+	 * 		max_price( length ) = max_price(k) + max_price(lenght-k)
+	 */
+	std::vector<int> max_price_for_rod(const std::vector<int> &price_of_length)
 	{
-		// max_price( length ) = max_price(k) + max_price(lenght-k)
+		int max_length = price_of_length.size();
+		std::vector<int> dp_array(max_length + 1);
+		std::vector<int> cut_off(max_length + 1);
 
-		int *dp_array = new int[max_length + 1];
-		int *cut_off = new int[max_length + 1];
-
-		for (int i = 0; i <= max_length; i++)
+		for (int i = 1; i <= max_length; i++)
 		{
-			dp_array[i] = price_of_length[i];
+			dp_array[i] = price_of_length[i - 1];
 			cut_off[i] = i;
 		}
+		dp_array[0] = 0;
 
-		for (int cut = 0; cut <= max_length; cut++)
+		for (int length = 1; length < max_length; length++)
 		{
-
-			for (int length = cut; length <= max_length; length++)
+			for (int cut = 1; cut < length; cut++)
 			{
-
 				if (dp_array[length] < dp_array[length - cut] + dp_array[cut])
 				{
-
 					dp_array[length] = dp_array[length - cut] + dp_array[cut];
 					cut_off[length] = cut;
 				}
@@ -53,18 +52,23 @@ namespace Dynamic
 		return result;
 	}
 
-	/*
-	 * Common Subsequence Problem
-	 * Finds the common subsequences between two strings and returns them in a vector
-	 * Should correct for input abracadabraemalesmagic abracadabrayfemalemagic
+	/**
+	 * Largest Common Subsequence Problem
+	 * Finds the largest common sequences between two strings 
+	 * and returns them in a vector of chars
+	 * 
+	 * Depends on the following recursion
+	 * 		common_seq(s1[i], s2[j]) = {
+	 * 					1 + common_seq(s1[i - 1] + s2[j - 1]) if s1[i] == s2[j],
+	 * 					max(common_seq(s1[i - 1], s2[j]), common_seq(s1[i], s2[j - 1]))
+	 * 		}
 	 */
-	std::vector<std::string> common_subsequence(std::string string_1, std::string string_2)
+	std::vector<char> common_subsequence(std::string string_1, std::string string_2)
 	{
 		int size_1 = string_1.length();
 		int size_2 = string_2.length();
 
-		std::string result = "";
-		std::vector<std::string> strings;
+		std::vector<char> strings;
 
 		int **string_matrix = new int *[size_1 + 1];
 
@@ -96,55 +100,49 @@ namespace Dynamic
 
 		int i = size_1, j = size_2;
 
-		auto reverse_string = [](std::string &result)
-		{
-			int last_index = result.length() - 1;
-			int limit = result.length() / 2;
-			for (int i = 0; i < limit; i++)
-			{
-				std::swap(result[i], result[last_index - i]);
-			}
-			return result;
-		};
-
 		while (i > 0 && j > 0)
 		{
 			if (string_1[i - 1] == string_2[j - 1])
 			{
-				result += string_1[i - 1];
+				strings.push_back(string_1[i - 1]);
 				i--;
 				j--;
 			}
 			else
 			{
-				if (!result.empty())
-				{
-					strings.push_back(reverse_string(result));
-					result = "";
-				}
-				if (string_matrix[i - 1][j] > string_matrix[i][j - 1])
-				{
-					i--;
-				}
-				else
-				{
-					j--;
-				}
+				(string_matrix[i - 1][j] > string_matrix[i][j - 1]) ? i-- : j--;
 			}
 		}
-		strings.push_back(reverse_string(result));
+		int size = strings.size();
+		for (int p = 0, q = size - 1; p < size / 2; p++, q--)
+		{
+			std::swap(strings[p], strings[q]);
+		}
+
+		for (int k = 0; k < size_1; k++)
+		{
+			delete[] string_matrix[k];
+		}
+		delete[] string_matrix;
+
 		return strings;
 	}
 
-	/*
+	/**
 	 * Longest Non decreasing sub-sequence problem with dynamic programmaing
 	 * Takes a array with comparable items and returns a vector to the longest increasing subsequence
-	 * There is more efficient way with using binary search
+	 * 
+	 * Depends on the following recursion
+	 * 		nds( :i ) = { 
+	 * 				max(nds( :j ) + 1) for all j < i such that array[j] <= array[j]
+	 * 		}
+	 * 
+	 * There is more efficient way with using binary search ( n log(n) )
 	 */
 	template <typename T>
-	std::vector<T> non_decreasing_subsequence(T *array, int size)
+	std::vector<T> non_decreasing_subsequence(std::vector<T> array)
 	{
-
+		int size = array.size();
 		int *size_at = new int[size];		 // Longest size found till ith index from left
 		int *last_seq_index = new int[size]; // Index of last element before current in an increasing sequence
 		std::vector<T> result;
@@ -186,20 +184,33 @@ namespace Dynamic
 			std::swap(result[i], result[j]);
 		}
 
+		delete[] size_at;
+		delete[] last_seq_index;
+
 		return result;
 	}
 
-	/*
+	/**
 	 * 0 - 1 Knapsack problem
 	 * Takes a list of weights, values, their size and max-weight as input
 	 * Returns the maximum value possible and a set of weights associated with it in a vector
+	 * 
+	 * Depends on the recursion
+	 * 		max_value_with( w[i], max_wt ) = max( 
+	 * 				max_value_with(w - {w[i]}, max_wt - w[i]) + v[i], max_value_with(w - w)
+	 * 				max_value_with(w - {w[i]}, max_wt) )
+	 * 		subject to sum of weights of all items less than max weight
 	 */
 	std::vector<long long> solve_knapsack(
-		long long *weights,
-		long long *values,
-		long long size,
+		std::vector<long long> weights,
+		std::vector<long long> values,
 		long long max_weight)
 	{
+		if (weights.size() != values.size())
+		{
+			return std::vector<long long>();
+		}
+		long long size = weights.size();
 		std::vector<long long> result;
 		long long **dp_array = new long long *[size + 1];
 		for (long long i = 0; i <= size; i++)
@@ -235,7 +246,7 @@ namespace Dynamic
 		int i = size, j = max_weight;
 		while (i > 0)
 		{
-			if (dp_array[i - 1][j] < dp_array[i][j])
+			if (j > 0 && dp_array[i - 1][j] < dp_array[i][j])
 			{
 				result.push_back(weights[i - 1]);
 				j -= weights[i - 1];
@@ -243,18 +254,29 @@ namespace Dynamic
 			i--;
 		}
 
+		for (int p = 0; p <= size; p++)
+		{
+			delete[] dp_array[p];
+		}
+		delete[] dp_array;
+
 		return result;
 	}
 
-	/*
+	/**
 	 * Coin Exchange Problem. Similar to knapsack problem
 	 * Takes an array of coins, its size and value as input
 	 * Returns a map containing information about the min. coins 
 	 * used for exchange.
+	 * 
+	 * Depends on recursion
+	 * 		min_coins_with(c[i], total) = min( 
+	 * 					1 + min_coins_with(c), total - c[i],
+	 *  				min_coins_with(c), total)
 	 */
-	std::map<long long, long long> coin_exchange(
-		long long *coins, long long size, long long value)
+	std::map<long long, long long> coin_exchange(std::vector<long long> coins, long long value)
 	{
+		int size = coins.size();
 		std::map<long long, long long> result;
 
 		long long **dp_array = new long long *[size + 1];
@@ -299,6 +321,12 @@ namespace Dynamic
 				j -= coin;
 			}
 		}
+
+		for (int p = 0; p <= size; p++)
+		{
+			delete[] dp_array[p];
+		}
+		delete[] dp_array;
 
 		return result;
 	}
