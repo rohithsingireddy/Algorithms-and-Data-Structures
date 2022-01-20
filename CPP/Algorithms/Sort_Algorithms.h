@@ -7,6 +7,9 @@ namespace Sort
 	/**
 	 * Takes two elements of same type and swaps their values
 	 * Returns null
+	 * 
+	 * Time Complexity = O(1)
+	 * Space Complexity = O(1)
 	 */
 	template <typename T>
 	void swap(T &a, T &b)
@@ -19,6 +22,9 @@ namespace Sort
 	/**
 	 * Implements Bubble Sort
 	 * Takes a vector array of comparable elements as a reference input and sorts them using Bubble sort
+	 * 
+	 * Time complexity = O(n^2)
+	 * Space Complexity = O(1)
 	 */
 	template <typename T>
 	void bubble_sort(std::vector<T> &array)
@@ -40,6 +46,9 @@ namespace Sort
 	 * Takes array and its size as input
 	 * Uses quick sort to sort the array
 	 * Returns null
+	 * 
+	 * Time complexity = O(n^2)
+	 * Space Complexity = O(1)
 	 */
 	template <typename T>
 	void insertion_sort(std::vector<T> &array)
@@ -61,6 +70,9 @@ namespace Sort
 	 * Takes array and its size as input
 	 * Uses quick sort to sort the array
 	 * Returns null
+	 * 
+	 * Time complexity = O(n^2)
+	 * Space complexity = O(1)
 	 */
 	template <typename T>
 	void selection_sort(std::vector<T> &array)
@@ -84,6 +96,9 @@ namespace Sort
 	 * Takes array and its size as input
 	 * Uses quick sort to sort the array
 	 * Returns null
+	 * 
+	 * Time complexity = O( n log(n) )
+	 * Space Complexity = O( log(n) )
 	 */
 	template <typename T>
 	void quick_sort(std::vector<T> &array)
@@ -132,6 +147,9 @@ namespace Sort
 	 * Takes a vector array, size and maximum value in array as input
 	 * Sorts the array using count sort
 	 * Only used on non-negaitve integers
+	 * 
+	 * Time complexity = O(n)
+	 * Space Complexity = O(n)
 	 */
 	template <typename T = unsigned long long>
 	void count_sort(std::vector<T> &array, int max_value_of_element, bool be_stable = true)
@@ -171,6 +189,9 @@ namespace Sort
 	 * Takes an non-negative integer array, size, maximum allowed digits in a number as input
 	 * Sorts the array using radix sort
 	 * Returns null
+	 * 
+	 * Time Complexity = O(n * max_digits)
+	 * Space Complexity = O(n)
 	 */
 	void radix_sort(std::vector<unsigned long long> &array, int max_digits = 20)
 	{
@@ -216,6 +237,9 @@ namespace Sort
 
 	/**
 	 * Used as a sub procdure in merge sort
+	 * 
+	 * Time Complexity = O(n)
+	 * Space Complexity = O(n)
 	 */
 	template <typename T>
 	void merge(std::vector<T> &array, int left, int right)
@@ -266,6 +290,9 @@ namespace Sort
 	/**
 	 * Takes array, starting index and ending index of the sub array to sort
 	 * Uses merge sort to sort the array
+	 * 
+	 * Time Complexity = O(n log(n) )
+	 * Space Complexity = O( n log(n) )
 	 */
 	template <typename T>
 	void merge_sort(std::vector<T> &array, int left, int right)
@@ -282,6 +309,8 @@ namespace Sort
 	/**
 	 * Takes array and its size as input
 	 * Uses Merge sort to sort the array
+	 * 
+	 * Same complexitites as above
 	 */
 	template <typename T>
 	void merge_sort(std::vector<T> &array)

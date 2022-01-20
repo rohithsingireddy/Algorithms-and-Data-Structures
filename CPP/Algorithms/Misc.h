@@ -11,29 +11,28 @@
 namespace Misc
 {
 
-    /*
+    /** 
      * Takes a sorted array(0th or base permutation) of elements, its size and the nth permutation to find
      * Arranges the given array's element to represent the order of them in nth permutation
      * Due to int limitations, only works with size 12 or less
+     * More info here - https://stackoverflow.com/a/7919887
+     * 
+     * Time complexity = O( n^2 )
+     * Space Complexity = O( n ) 
      */
     template <typename T>
-    void nth_permutation_of(T *array, int size, int nth_permutation)
+    void nth_permutation_of(std::vector<T> &array, int nth_permutation)
     {
-
+        int size = array.size();
         int *new_indices = new int[size];
         int factorial = 1;
 
         for (int i = 1, j = size - 1; i <= size; i++, j--)
         {
-
             new_indices[j] = j;
-
-            if (nth_permutation != 0)
-            {
-                nth_permutation /= factorial;
-                new_indices[j] += (nth_permutation % i);
-                factorial *= i; // Will overflow if size is greater than 12
-            }
+            int temp = nth_permutation/factorial;
+            new_indices[j] += (temp % i);
+            factorial *= i; // Will overflow if size is greater than 12
         }
 
         // The element at new index will be inserted at current index
@@ -51,45 +50,36 @@ namespace Misc
                 array[i] = temp;
             }
         }
+
+        delete[] new_indices;
     }
 
-    /*
+    /**
      * A naive implementation for printing every permutation of a sequence using backtracking.
      * Assumes the given array is sorted.
      * Takes sequence array and its size as input
      * Returns a pointer to an array of elements which have all the permutaions
      * int limitations require size to be less than 13
+     * 
+     * Time Complexity = O( no_of_permutations or n! )
+     * Space Complexity = O( no_of_permutations or n! )
      */
     template <typename T>
-    T **all_permutations(T *sequence, int size)
+    std::vector<std::vector<T>> all_permutations(std::vector<T> sequence)
     {
-
+        int size = sequence.size();
         bool *is_this_considered = new bool[size];
 
-        std::deque<T> deque;
-
-        int factorial = 1;
-        for (int i = 1; i <= size; i++)
-        {
-            factorial *= i;
-            is_this_considered[i - 1] = false;
-        }
-
-        T **permutations = new T *[factorial];
-        int index = 0;
+        std::vector<T> holder;
+        std::vector<std::vector<T>> permutations;
 
         std::function<void()> recurse_for_permutations =
-            [&size, &is_this_considered, &permutations, &deque,
-             &recurse_for_permutations, &index, &sequence]()
+            [&size, &is_this_considered, &permutations, &holder,
+             &recurse_for_permutations, &sequence]()
         {
-            if (deque.size() == size)
+            if (holder.size() == size)
             {
-                permutations[index] = new T[size];
-                for (int i = 0; i < size; i++)
-                {
-                    permutations[index][i] = deque[i];
-                }
-                index++;
+                permutations.push_back(holder);
             }
             else
             {
@@ -98,43 +88,39 @@ namespace Misc
                     if (!is_this_considered[i])
                     {
                         is_this_considered[i] = true;
-                        deque.push_back(sequence[i]);
+                        holder.push_back(sequence[i]);
                         recurse_for_permutations();
                         is_this_considered[i] = false;
-                        deque.pop_back();
+                        holder.pop_back();
                     }
                 }
             }
         };
         recurse_for_permutations();
+
+        delete[] is_this_considered;
         return permutations;
     }
 
-    /*
+    /**
      * N Queen Puzzle Problem through backtracking
      * Problem involves finding a valid state in which n queens can be placed on a nxn chess board 
      * without being in a position to be attacked by other queens
      * Takes a positive integer ( > 3 ) as input 
      * Returns a pointer to an array of boolean pointers  which represent whether the queen is placed on the position
      * if chess_board[i][j] is true, then queen is placed there.
+     * 
+     * Time complexity = O(n!)
+     * Space complexity = O(n**3)
      */
-    bool **n_queen_puzzle_problem(int n)
+    std::vector<std::vector<bool>> n_queen_puzzle_problem(int n)
     {
         if (n < 4)
         {
             throw std::invalid_argument("Cannot be placed on a chess board with size less than 4");
         }
 
-        bool **chess_board = new bool *[n];
-
-        for (int i = 0; i < n; i++)
-        {
-            chess_board[i] = new bool[n];
-            for (int j = 0; j < n; j++)
-            {
-                chess_board[i][j] = false;
-            }
-        }
+        std::vector<std::vector<bool>> chess_board(n, std::vector<bool>(n, false));
 
         // Helper function to validate a candidate solution
         auto validate = [&chess_board, &n](int i, int j) -> bool

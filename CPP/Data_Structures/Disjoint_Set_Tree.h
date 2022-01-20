@@ -28,7 +28,8 @@ class Disjoint_Set_Tree
 
 	std::vector<Set_node *> nodes;
 	int size = 0;
-	/* 
+	
+	/** 
 	 * Finds the parent node( representative of set it belongs to) 
 	 * of the given node
 	 */
@@ -41,7 +42,7 @@ class Disjoint_Set_Tree
 
 public:
 
-	/*
+	/**
 	 * Returns the data of parent (or representative ) of index'th node
 	 */
 	T find_parent(int index)
@@ -50,7 +51,7 @@ public:
 	}
 
 
-	/*
+	/**
 	 * Takes the indices of the sets( indices based on insertion order ) as input
 	 * Connects sets of i and j if they are disjoint. Otherwise does nothing
 	 * Connects j set to i set if both ranks are equal
@@ -62,7 +63,6 @@ public:
 		Set_node *x_parent = find_set(x);
 		Set_node *y_parent = find_set(y);
 
-		// printf("%d %d\n", x_parent->data, y_parent->data);
 		if (x_parent == y_parent)
 		{
 			return;
@@ -83,7 +83,7 @@ public:
 	}
 
 
-	/*
+	/**
 	 * Takes an object as input
 	 * Inserts the object into a seperate disjoint set and 
 	 * returns its set number
@@ -96,7 +96,7 @@ public:
 		return ++size;
 	}
 
-	/*
+	/**
 	 * Takes set number as input
 	 * Returns the set elements if the given set number is a parent( or representative) of the set
 	 * Otherwise returns an empty vector

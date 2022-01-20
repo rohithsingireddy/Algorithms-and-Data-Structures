@@ -17,10 +17,9 @@ def nth_factorial(sequence:list, nth_permutation:int) -> list:
     factorial = 1
 
     for i in range(1, size + 1):
-        if nth_permutation > 0:
-            nth_permutation //= factorial
-            new_indices[size-i] += (nth_permutation % i)
-            factorial *= i
+        temp = nth_permutation // factorial
+        new_indices[size-i] += (temp % i)
+        factorial *= i
     
     for i in range(size):
         if new_indices[i] != i:

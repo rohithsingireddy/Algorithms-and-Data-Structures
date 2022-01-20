@@ -11,9 +11,12 @@
 namespace Math_Algorithms
 {
 
-    /*
+    /**
      * Takes a number as input and returns its factors in an ordered set
      * There is a faster method to calculate number of factors for relatively small numbers
+     * 
+     * Time Complexity  = O( sqrt(N) * log(no_of_factors) ) 
+     * Space Complexity = O( no_of_factors )
      */
     std::set<unsigned long long> get_factors(unsigned long long number)
     {
@@ -29,17 +32,20 @@ namespace Math_Algorithms
         return factor_set;
     }
 
-    /*
+    /**
      * Takes a number as input and returns a bool array indicating which number below the given number are not prime
      * Implemented using Sieve of erasthonesis
+     * 
+     * Time Complexity = O( N * log( log( N )) )
+     * Space Complexity = O( N )
      */
-    bool *prime_with_erasthonesis(const unsigned long long number)
+    std::vector<bool> prime_with_erasthonesis(const unsigned long long number)
     {
         if (number >= INT64_MAX)
         {
             throw std::invalid_argument("Cannot be used\n");
         }
-        bool *is_prime = new bool[number + 1];
+        std::vector<bool> is_prime(number + 1, false);
         for (unsigned long long i = 0; i <= number; i++)
         {
             is_prime[i] = true;
@@ -61,7 +67,7 @@ namespace Math_Algorithms
         return is_prime;
     }
 
-    /*
+    /**
      * Takes two non-negative numbers as input and returns a poiinter to an array
      * that has their GCD along with two numbers in a array that satisy the equation
      * gcd(number_1, number_2) = (returned_1) * number_1 + (returned_2) * number_2
@@ -69,11 +75,14 @@ namespace Math_Algorithms
      *
      * returned_1 is mod multiplicative inverse of number_1 with base number_2 and vice versa.
      * (returned_1 * number_1) % number_2 = 1 and (returned_2 * number_2) % number_1 = 1
+     * 
+     * Time Complexity = O( log(large_number) )
+     * Space Complexity = O( log(large_number) )
      */
-    long long *extended_gcd(long long number_1, long long number_2)
+    std::vector<long long> extended_gcd(long long number_1, long long number_2)
     {
 
-        long long *gcd_array = new long long[3];
+        std::vector<long long> gcd_array(3);
         if (number_1 < number_2)
         {
             std::swap(number_1, number_2);
@@ -86,7 +95,7 @@ namespace Math_Algorithms
         }
         else
         {
-            long long *temp_gcd_array = extended_gcd(number_2, number_1 % number_2);
+            std::vector<long long> temp_gcd_array = extended_gcd(number_2, number_1 % number_2);
             gcd_array[0] = temp_gcd_array[0];
 
             // assert(
@@ -100,15 +109,19 @@ namespace Math_Algorithms
         return gcd_array;
     }
 
-    /*
+    /**
      * Implements chinese remainder theorm to solve equations a = r1( mod n1), a = r2( mod n2).....
      * In other words, finding a number that leaves remainders( r1, r2, r3.......) when divided by (n1, n2, n3.......)
      * Takes a N by 2 array as input with each row having 2 positive integers (r1, n1)) and number of equations as input.
      * Returns the lowest positive value satisfying the given equations
+     * 
+     * Time Complexity = O(no_of_equations * log(number))
+     * Space Complexity = O(1)
      */
-    int solve_with_crt(long long **equations, int number_of_equations)
+    int solve_with_crt(std::vector<std::vector<long long>> equations)
     {
         // equation[i][0] - remainder, equation[i][1] - divisor
+        int number_of_equations = equations.size();
         for (int i = 0; i < number_of_equations; i++)
         {
             if (equations[i][0] >= equations[i][1])
@@ -130,15 +143,17 @@ namespace Math_Algorithms
             long long m = n / equations[i][1];
 
             long long m_inv;
-            long long *gcd_array = extended_gcd(m, equations[i][1]);
-            if (m > equations[i][1])
-            {
-                m_inv = gcd_array[1];
-            }
-            else
-            {
-                m_inv = gcd_array[2];
-            }
+            std::vector<long long> gcd_array = extended_gcd(m, equations[i][1]);
+
+            m_inv = (m > equations[i][1])? gcd_array[1] : gcd_array[2];
+            // if (m > equations[i][1])
+            // {
+            //     m_inv = gcd_array[1];
+            // }
+            // else
+            // {
+            //     m_inv = gcd_array[2];
+            // }
             m_inv %= equations[i][1];
             if (m_inv < 0)
             {
@@ -151,11 +166,14 @@ namespace Math_Algorithms
         return result;
     }
 
-    /*
+    /**
      * Uses binary exponentiation to calculate the power of a number modulo another number.
      * Takes the number, power and base as input
      * Returns the power of number modulo base as output
      * Overflow may occur for sufficiently large numbers if the base is default
+     * 
+     * Time complexity = O(log(power))
+     * Space Complexity = O(1)
      */
     unsigned long long binary_exponentiation(
         unsigned long long number,
@@ -166,19 +184,18 @@ namespace Math_Algorithms
         unsigned long long result = 1;
         unsigned long long running_product = number;
 
-        unsigned long long i = 1; // Used for 'for' loop invariant
-        unsigned long long c = 0; // Above comment
+        // unsigned long long i = 1; // Used for 'for' loop invariant
+        // unsigned long long c = 0; // Above comment
 
         while (power > 0)
         {
-
             if ((power & 1) == 1)
             {
-                c += i;
+                // c += i;
                 result *= running_product; // Overflow may occur here
                 result %= base;
             }
-            i *= 2;
+            // i *= 2;
             running_product *= running_product; // Overflow may occur here
             running_product %= base;
 

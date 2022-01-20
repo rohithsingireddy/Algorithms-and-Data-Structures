@@ -15,6 +15,9 @@ namespace Dynamic
 	 * 
 	 * Based on the following recursive function		
 	 * 		max_price( length ) = max_price(k) + max_price(lenght-k)
+	 * 
+	 * Time Complexity = O( max_length ^ 2 )
+	 * Space Complexity = O( max_length * 2)
 	 */
 	std::vector<int> max_price_for_rod(const std::vector<int> &price_of_length)
 	{
@@ -59,9 +62,12 @@ namespace Dynamic
 	 * 
 	 * Depends on the following recursion
 	 * 		common_seq(s1[i], s2[j]) = {
-	 * 					1 + common_seq(s1[i - 1] + s2[j - 1]) if s1[i] == s2[j],
-	 * 					max(common_seq(s1[i - 1], s2[j]), common_seq(s1[i], s2[j - 1]))
+	 * 					1 + common_seq(s1[i - 1], s2[j - 1]) if s1[i] == s2[j],
+	 * 					max(common_seq(s1[i - 1], s2[j]), common_seq(s1[i], s2[j - 1])) if s1[i] != s2[j]
 	 * 		}
+	 * 
+	 * Time Complexity = O( len1 * len2 )
+	 * Space Complexity = O( len1 * len2 )
 	 */
 	std::vector<char> common_subsequence(std::string string_1, std::string string_2)
 	{
@@ -138,6 +144,9 @@ namespace Dynamic
 	 * 		}
 	 * 
 	 * There is more efficient way with using binary search ( n log(n) )
+	 * 
+	 * Time Complexity = O( n * n )
+	 * Space Complexity = O( n )
 	 */
 	template <typename T>
 	std::vector<T> non_decreasing_subsequence(std::vector<T> array)
@@ -200,6 +209,9 @@ namespace Dynamic
 	 * 				max_value_with(w - {w[i]}, max_wt - w[i]) + v[i], max_value_with(w - w)
 	 * 				max_value_with(w - {w[i]}, max_wt) )
 	 * 		subject to sum of weights of all items less than max weight
+	 * 
+	 * Time Complexity = O( n * Wt )
+	 * Space Complexity = O( n * wt )
 	 */
 	std::vector<long long> solve_knapsack(
 		std::vector<long long> weights,
@@ -273,6 +285,9 @@ namespace Dynamic
 	 * 		min_coins_with(c[i], total) = min( 
 	 * 					1 + min_coins_with(c), total - c[i],
 	 *  				min_coins_with(c), total)
+	 * 
+	 * Time Complexity = O( n * V )
+	 * Space Complexity = ( n * V )
 	 */
 	std::map<long long, long long> coin_exchange(std::vector<long long> coins, long long value)
 	{

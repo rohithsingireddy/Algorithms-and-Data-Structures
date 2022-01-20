@@ -8,6 +8,9 @@ namespace D_and_C
      * Solves the max-subarray problem using divide and conquer
      * Returns a vector of size 3 with the sum, left and right indices of sub-array
      * Kadane's algorithm has better time complexity than this ( linear time complexity)
+     * 
+     * Time Complexity = O( n log(n) )
+     * Space Complexity = O( log(n) )
      */
     std::vector<int> max_sub_array_sum(const std::vector<int> &array)
     {

@@ -9,16 +9,16 @@ namespace Data_Structures
         long long *array;
         long long size;
 
-        /*
+        /**
          * Gets the integer value of the least significant bit whose value is 1
          * If index is 188( 10111100 ), then the return value is 4( 100 )
          */
         inline long long lsb(long long index) const
         {
-            return index & -index;
+            return (index & -index);
         }
 
-        /*
+        /**
          * Returns the last index whose value is added to value at given index
          */
         inline long long prev(long long index) const
@@ -26,7 +26,7 @@ namespace Data_Structures
             return index - lsb(index);
         }
 
-        /*
+        /**
          * Returns the next index where the value at the current index to be added
          */
         inline long long next(long long index) const
@@ -34,7 +34,7 @@ namespace Data_Structures
             return index + lsb(index);
         }
 
-        /*
+        /**
          * Index bound checking. Throws an exception if index is out of bound
          */
         inline void check_index(long long index)
@@ -52,7 +52,7 @@ namespace Data_Structures
             array = new long long[this->size];
         }
 
-        /*
+        /**
          * Converts and stores the given vector array as a Fenwick Array
          */
         Fenwick_Tree(std::vector<long long> given_array)
@@ -79,7 +79,7 @@ namespace Data_Structures
             delete[] array;
         }
 
-        /*
+        /**
          * Adds the value to elements at indices given that two selected
          * consecutive indices differ from each other by one bit
          * In other words, it adds value to element at index
@@ -94,7 +94,7 @@ namespace Data_Structures
             }
         }
 
-        /*
+        /**
          * Inserts the value at an index
          */
         void insert(long long index, long long value)
@@ -102,13 +102,13 @@ namespace Data_Structures
             this->add(index, value - this->get_value_at(index));
         }
 
-        /*
+        /**
          * Gets the sum of all elements between left index (inclusive )
          * and right index( exclusive )
          */
         long long range_sum(long long left, long long right)
         {
-            if( left > right )
+            if (left > right)
             {
                 std::swap(left, right);
             }
@@ -128,7 +128,7 @@ namespace Data_Structures
             return sum;
         }
 
-        /*
+        /**
          * Gets the sum between first element and (index - 1)'th element
          */
         long long prefix_sum(long long index)
@@ -142,7 +142,7 @@ namespace Data_Structures
             return sum;
         }
 
-        /*
+        /**
          * Gets the value at the given index
          */
         long long get_value_at(long long index)
@@ -150,16 +150,16 @@ namespace Data_Structures
             return this->range_sum(index, index + 1);
         }
 
-        /*
+        /**
          * Returns the array used for construction
          */
         std::vector<long long> get_array()
         {
             std::vector<long long> result(this->size - 1);
 
-            long long* array = new long long[this->size];
+            long long *array = new long long[this->size];
 
-            for( long long i = 0; i < this->size; i++ )
+            for (long long i = 0; i < this->size; i++)
             {
                 array[i] = this->array[i];
             }
@@ -173,7 +173,7 @@ namespace Data_Structures
                 }
             }
 
-            for( int i = 1; i < this->size; i++ )
+            for (int i = 1; i < this->size; i++)
             {
                 result[i - 1] = array[i];
             }
@@ -181,7 +181,5 @@ namespace Data_Structures
 
             return result;
         }
-
-
     };
 }

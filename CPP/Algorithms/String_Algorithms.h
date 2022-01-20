@@ -5,7 +5,7 @@
 
 namespace String_Algorithms
 {
-    /*
+    /**
      * Pattern matching in a text using Rabin-Karp Algorithm.
      * Does not work for most inputs due to integer overflows
      * Same logic is implemented in python where it works
@@ -62,7 +62,7 @@ namespace String_Algorithms
         return false;
     }
 
-    /*
+    /**
      * Knuth Morris Pratt algorithm
      * Takes text and pattern strings as input
      * Throws an exception if pattern is larger than string
@@ -115,7 +115,7 @@ namespace String_Algorithms
         return result;
     }
 
-    /*
+    /**
      * Suffix array
      * Takes a string, maximum value of single character and sentinel as input
      * Returns a vector containing the suffix array
@@ -211,7 +211,7 @@ namespace String_Algorithms
         return suffix_array;
     }
 
-    /*
+    /**
      * Longest common prefix Array
      * Takes a string and suffix array as input
      * Returns a vector array that has longest prefix length between s[i...n] and s[i + 1 ... n]
@@ -255,7 +255,7 @@ namespace String_Algorithms
         
     }
 
-    /*
+    /**
      * Z-Algorithm
      * Takes a string, pattern and sentinel as input
      * Returns the indices where the pattern exists in the string

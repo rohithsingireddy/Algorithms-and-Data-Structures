@@ -10,7 +10,7 @@
 #include "Disjoint_Set_Tree.h"
 #include "Fibonnaci_Heap.h"
 
-/*
+/**
  * Uses pointer based representation of graph
  * Recommended to use reset if trying to use multiple algorithms on same graph object
  * This file is subject to mission creep
@@ -75,7 +75,7 @@ class Graph
 
         T data;
 
-        void operator=(const Node other)
+        void operator=(const Node &other)
         {
             this->distance_from_source = other.distance_from_source;
             this->parent_in_traversal = other.parent_in_traversal;
@@ -83,6 +83,10 @@ class Graph
             this->end_step = other.end_step;
             this->connected_component_label = other.connected_component_label;
             this->pre_order_number = other.pre_order_number;
+
+            this->label = other.label;
+            this->in_degree = other.degree;
+            this->out_degree = other.degree;
 
             this->data = other.data;
         }
@@ -143,7 +147,7 @@ class Graph
     // For shortest paths
     std::vector<std::vector<int>> predecessor, short_path_weights;
 
-    /*
+    /**
      * Helper function for inserting edge
      * So that I don't DRMyself
      */
@@ -158,7 +162,7 @@ class Graph
         component.union_set(from, to);
     }
 
-    /*
+    /**
      * Helper function for checking index bounds
      */
     inline void check_index(int index)
@@ -169,7 +173,7 @@ class Graph
         }
     }
 
-    /*
+    /**
      * Helper function to get a copy of edges
      */
     std::vector<Edge> get_edges()
@@ -185,7 +189,7 @@ class Graph
         return result;
     }
 
-    /*
+    /**
      * Returns the matrix representation of edges of graph
      * with weights.
      * Uses nodes labels for matrix indices
@@ -215,7 +219,7 @@ class Graph
         return matrix;
     }
 
-    /*
+    /**
      * Helper function to check if a graph is undirected and
      * is connected
      */
@@ -274,7 +278,7 @@ public:
         delete[] edges;
     }
 
-    /*
+    /**
      * Takes index of from node and to node and weight associated with the edge
      * Inserts edges into the graph
      * The same edge is inserted twice in case of undirected graph
@@ -293,7 +297,7 @@ public:
         }
     }
 
-    /*
+    /**
      * Resets distances and parents of each node (Required for BFS)
      * Resets start_step and end_step of each node(Required for DFS)
      * Resets connected_component_label of each node( Required for finding Strongly connected components)
@@ -307,7 +311,7 @@ public:
         }
     }
 
-    /*
+    /**
      * Takes the source vertex index as input
      * Traversed the graph using Breadth First search
      */
@@ -339,7 +343,7 @@ public:
         }
     }
 
-    /*
+    /**
      * Depth first search
      * Assigns the start_step and end_step for each node
      * The assignments are influenced by the ordering of the node indices
@@ -409,7 +413,7 @@ public:
         }
     }
 
-    /*
+    /**
      * Finds the strongly connected components of the graph using
      * Path based strong component algorithm
      */
@@ -417,7 +421,7 @@ public:
     {
         int counter = 0;
         int index_of_cc = 0; // Index for connected components
-        std::stack<Node *> unassigned, different;
+        std::stack<Node *> unassigned, different; //Yet to be assigned a component label
 
         std::function<void(Node *)> visit_node =
             [&counter, &visit_node, &unassigned, &different,
@@ -463,7 +467,7 @@ public:
         }
     }
 
-    /*
+    /**
      * Minimum Spanning Tree using Kruskal Algorithm
      * Returns the edges that are in Kruskal minimum spanning tree in a vector of pairs
      * The last element of returned vector has weight of spanning tree
@@ -499,7 +503,7 @@ public:
         return edges;
     }
 
-    /*
+    /**
      * Prim's spanning tree algorithm
      * Takes a source index and creates a min spanning tree
      * with given index'th node as input
@@ -569,7 +573,7 @@ public:
         return result;
     }
 
-    /*
+    /**
      * Bellman Ford Algorithm
      * Returns the shortest path from source to other nodes in case of different integer weights
      * It is impossible to have shortest path between nodes in graphs with negative weight cycles
@@ -619,7 +623,7 @@ public:
         return true;
     }
 
-    /*
+    /**
      * Dijkstra Algorithm
      * Finds the shortest path of all nodes from the node with source_index
      * Cannot be used on graphs with negative weights
@@ -674,7 +678,7 @@ public:
         }
     }
 
-    /*
+    /**
      * FloydWarshall Algorithm
      * Updates the short path weights and predecessor matrix
      * Returns the short path weights in a vector matrix
@@ -724,7 +728,7 @@ public:
         return short_paths;
     }
 
-    /*
+    /**
      * All pair shortest path
      * Updates the shortest weights and predecessor matrix
      * Returns the updated shortest weights in a vector matrix
@@ -780,7 +784,7 @@ public:
         return pred;
     }
 
-    /*
+    /**
      * Path due to predecessor matrix
      * Returns all the indices between the path in a vector
      * Should check if it terminates for more inputs
@@ -807,7 +811,7 @@ public:
         return result;
     }
 
-    /*
+    /**
      * Returns the nodes between the from index node and to index node
      * Shoulb be called after running breadth_traversal on node with 'from' index
      * Can also be used to find nodes in path of depth-first tree provided both belong
@@ -838,7 +842,7 @@ public:
         return result;
     }
 
-    /*
+    /**
      * Returns labels( indices ) of nodes in topologically sorted order
      * Should be called after running depth_traversal with sort_topologically set as true
      */
@@ -857,7 +861,7 @@ public:
         return result;
     }
 
-    /*
+    /**
      * Returns true if node with from index can reach the node with to index
      */
     bool can_reach(int from, int to)
@@ -867,7 +871,7 @@ public:
         return component.find_parent(from) == component.find_parent(to);
     }
 
-    /*
+    /**
      * Takes a index of a node and value to insert as input
      * Stores the given data at 'index'th node
      */
@@ -877,7 +881,7 @@ public:
         nodes[index].data = data;
     }
 
-    /*
+    /**
      * Takes an index as input and returns the data stored at
      * index'th node
      */
@@ -887,7 +891,7 @@ public:
         return nodes[index].data;
     }
 
-    /*
+    /**
      * Returns the distance from a source on which breadth_traversal is called
      */
     int get_distance_from_source(int index)
@@ -901,7 +905,7 @@ public:
         return k;
     }
 
-    /*
+    /**
      * Returns the start and end steps for a node after depth_traversal is called
      */
     std::pair<int, int> get_start_and_end_steps(int index)
@@ -910,7 +914,7 @@ public:
         return std::make_pair(nodes[index].start_step, nodes[index].end_step);
     }
 
-    /*
+    /**
      * Returns the label of connected component the node belongs to
      */
     int get_strongly_connected_component(int index)
@@ -918,7 +922,8 @@ public:
         check_index(index);
         return nodes[index].connected_component_label;
     }
-    /*
+
+    /**
      * Returns the distance from a source on which
      * breadth_traversal or depth_traversal or dijkstra_shortestpath
      * is called
@@ -929,7 +934,7 @@ public:
         return this->get_distance_from_source(index);
     }
 
-    /*
+    /**
      * Returns the start and end steps for a node after depth_traversal is called
      */
     std::pair<int, int> operator()(int index)
